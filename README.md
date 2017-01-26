@@ -77,3 +77,7 @@ The format is `urlLINK:linktext;urlLINK:linktext`, where you need to replace the
 
 ## Tracking
 If you are a self obsessed sociopath or insecure graduate student, like myself, you can easily add analytics by creating a Google Tag Manager account and pasting the container code onto any of the `index.html` pages. Another nifty idea would to be to create an include for analytics, but since the site is quite simple, I'll leave this to you.
+
+## Credit
+Copied from https://github.com/tyler-abbot/DrJekyll
+
