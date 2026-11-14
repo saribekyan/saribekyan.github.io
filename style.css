@@ -1,0 +1,39 @@
+/* Layout for the home page and writing. Colours come from theme.css. */
+*,*::before,*::after{box-sizing:border-box}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:"EB Garamond", Garamond, "Times New Roman", serif;
+  font-size:20px; line-height:1.6;
+}
+.wrap{max-width:680px; margin:0 auto; padding:64px 20px 80px}
+a{color:var(--accent); text-underline-offset:3px; text-decoration-thickness:1px}
+h1{font-weight:500; font-size:clamp(2.2rem,7vw,3.2rem); line-height:1.05; margin:0 0 12px; letter-spacing:-0.01em}
+h2{font-weight:500; font-size:1.05rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--muted); margin:56px 0 10px}
+p{margin:0 0 14px}
+.lede{font-size:1.15rem}
+.muted{color:var(--muted)}
+
+ul.list{list-style:none; margin:0; padding:0; border-top:1px solid var(--rule)}
+ul.list li{border-bottom:1px solid var(--rule)}
+ul.list a{display:flex; flex-wrap:wrap; justify-content:space-between; gap:2px 16px; padding:12px 0; text-decoration:none; color:var(--ink)}
+ul.list a:hover .t{color:var(--accent)}
+ul.list .t{font-size:1.2rem}
+ul.list .d{color:var(--muted); font-style:italic}
+
+footer{margin-top:72px; color:var(--muted); font-size:0.9rem}
+
+/* writing pages */
+.home{display:inline-block; margin-bottom:28px; color:var(--muted); font-size:0.95rem; text-decoration:none}
+.home:hover{color:var(--accent)}
+article h1{margin-bottom:6px}
+article .date{color:var(--muted); font-style:italic; margin-bottom:36px}
+article h2{text-transform:none; letter-spacing:0; font-size:1.5rem; color:var(--ink); margin:40px 0 8px}
+article blockquote{margin:20px 0; padding-left:18px; border-left:2px solid var(--rule); color:var(--muted); font-style:italic}
+article img{max-width:100%; height:auto; display:block}
+article .date{margin-bottom:20px}
+article .prompt{color:var(--muted); font-style:italic; margin-bottom:32px}
+details.spoiler{margin-top:48px; border-top:1px solid var(--rule); padding-top:20px; scroll-margin-top:24px}
+details.spoiler summary{cursor:pointer; color:var(--accent); font-size:1.05rem; letter-spacing:0.08em; text-transform:uppercase}
+details.spoiler img{margin-top:20px; border-radius:4px}
+
+@media (max-width:600px){ body{font-size:18px} .wrap{padding-top:40px} }

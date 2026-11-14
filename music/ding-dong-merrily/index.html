@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ding Dong! Merrily on High — melody for solo voice</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EEF2F1; --page:#FCFDFC; --ink:#1C2B2A; --muted:#566765; --accent:#8A5A12; --accent-ink:#FFFFFF; --rule:#C9D3D1; --sung:#B99A6A;
+  color-scheme: light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#101716; --page:#172120; --ink:#E6ECEA; --muted:#9AAAA7; --accent:#E0AE5A; --accent-ink:#1A1206; --rule:#2C3A38; --sung:#8A6E40;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#101716; --page:#172120; --ink:#E6ECEA; --muted:#9AAAA7; --accent:#E0AE5A; --accent-ink:#1A1206; --rule:#2C3A38; --sung:#8A6E40;
+  color-scheme: dark;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:"EB Garamond", Garamond, "Times New Roman", serif;
+  font-size:19px; line-height:1.55;
+}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--page)}
+.wrap{max-width:900px;margin:0 auto;padding:0 18px}
+header{padding:44px 0 22px}
+h1{font-weight:500;font-size:clamp(2.1rem,6vw,3.3rem);line-height:1.05;margin:0 0 10px;letter-spacing:-0.01em}
+.lede{margin:0;max-width:60ch;color:var(--ink)}
+.credit{margin:8px 0 0;color:var(--muted);font-size:0.9rem;font-style:italic;max-width:66ch}
+
+.bar{
+  position:sticky; top:env(safe-area-inset-top,0px); z-index:5;
+  background:var(--page); border-bottom:1px solid var(--rule); border-top:1px solid var(--rule);
+}
+.bar .wrap{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;padding-top:10px;padding-bottom:10px}
+.btns{display:flex;gap:8px}
+button{
+  font:inherit;font-size:1rem;border-radius:6px;cursor:pointer;
+  padding:6px 14px;border:1px solid var(--rule);background:transparent;color:var(--ink);
+}
+button.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600;min-width:5.5em}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+label.ctl{display:flex;align-items:center;gap:6px;font-size:0.95rem;color:var(--muted)}
+select{font:inherit;font-size:0.95rem;color:var(--ink);background:var(--page);border:1px solid var(--rule);border-radius:6px;padding:4px 6px}
+input[type=range]{accent-color:var(--accent);width:110px}
+.tempo-val{min-width:2.4em;color:var(--ink);font-variant-numeric:tabular-nums}
+.karaoke{flex-basis:100%;display:flex;align-items:baseline;gap:12px;min-height:2.1em;border-top:1px solid var(--rule);padding-top:8px;margin-top:2px}
+.k-label{font-size:0.85rem;color:var(--muted);white-space:nowrap;min-width:5.5em}
+.k-line{font-size:1.45rem;line-height:1.25;color:var(--muted)}
+.k-line .done{color:var(--accent)}
+.k-line .now{color:var(--accent);font-weight:700;text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:4px}
+.k-hint{font-size:0.95rem;color:var(--muted);font-style:italic}
+input[type=checkbox]{accent-color:var(--accent)}
+
+main{padding:22px 0 40px}
+.sheet{background:var(--page);border:1px solid var(--rule);border-radius:4px;padding:18px 10px 10px;overflow-x:auto}
+#score{color:var(--ink)}
+#score svg{display:block;margin:0 auto}
+#score .abcjs-note, #score .abcjs-lyric{cursor:pointer}
+#score .sung, #score .sung *{fill:var(--sung) !important}
+#score .playing, #score .playing *{fill:var(--accent) !important}
+#score text.playing, #score tspan.playing{font-weight:700}
+.hint{color:var(--muted);font-size:0.9rem;margin:8px 2px 0}
+
+section.notes{max-width:64ch;margin-top:34px}
+section.notes h2{font-weight:500;font-size:1.5rem;margin:28px 0 6px}
+section.notes p{margin:0 0 12px}
+footer{color:var(--muted);font-size:0.85rem;padding:10px 0 40px;max-width:66ch}
+footer a{color:var(--accent)}
+@media (max-width:600px){
+  body{font-size:18px}
+  header{padding-top:28px}
+  input[type=range]{width:90px}
+  .k-line{font-size:1.25rem}
+  .k-label{min-width:0}
+}
+</style>
+<link rel="stylesheet" href="/theme.css">
+</head>
+<body>
+<div class="home-bar"><a href="/">← hayk.saribekyan.me</a></div>
+<header class="wrap">
+  <h1>Ding dong! merrily on high</h1>
+  <p class="lede">A sing-along score for a single voice: the notes and words light up as they go by. Pick a key that suits your range, then tap any note to start from there.</p>
+  <p class="credit">Tune: Branle de l’Official, from Thoinot Arbeau’s Orchésographie (1589). Words: George Ratcliffe Woodward (1924).</p>
+</header>
+
+<div class="bar">
+  <div class="wrap">
+    <div class="btns">
+      <button id="play" class="primary" type="button">Play</button>
+      <button id="pitch" type="button" title="Plays the key chord, then your first note">Starting note</button>
+    </div>
+    <label class="ctl">Key <select id="key"></select></label>
+    <label class="ctl">Voice
+      <select id="voice">
+        <option value="high">Higher (as written)</option>
+        <option value="low">Lower (octave down)</option>
+      </select>
+    </label>
+    <label class="ctl">Play
+      <select id="section">
+        <option value="verse">Verse tune</option>
+        <option value="gloria">Gloria</option>
+        <option value="one" selected>One full verse</option>
+        <option value="all">All three verses</option>
+      </select>
+    </label>
+    <label class="ctl">Tempo <input id="tempo" type="range" min="50" max="160" step="2" value="100"><span class="tempo-val" id="tempoVal">100</span></label>
+    <label class="ctl"><input id="loop" type="checkbox"> Loop</label>
+    <div class="karaoke" aria-live="off"><span class="k-label" id="kLabel"></span><span class="k-line" id="kLine"><span class="k-hint">Press Play, or tap a note to start from there.</span></span></div>
+  </div>
+</div>
+
+<main class="wrap">
+  <div class="sheet"><div id="score"></div></div>
+  <p class="hint">Tap any note to start playing from there. The verse tune is sung twice per verse (first and second lines, then third and fourth), and the Gloria is repeated.</p>
+
+  <section class="notes">
+    <h2>How it fits together</h2>
+    <p>Each verse uses the same short tune twice, then the Gloria comes round twice. The whole melody sits within one octave: the lowest note is the one on “high” and “in”, the highest is the very first note of “Glo-”. If that top note feels strained, drop the key; if “high” rumbles, raise it.</p>
+    <h2>The Gloria</h2>
+    <p>It is a falling sequence: the same six-note shape, “long-short, four quick”, starting one step lower each bar. Learn the first bar on a neutral “loo”, then simply step it down. Choirs share the breathing, but on your own you need a deep breath before “Glo-” and, if needed, a quick sip at the start of the fifth bar, where the run is halfway down.</p>
+    <h2>Singing it unaccompanied</h2>
+    <p>Use the Starting note button before each attempt, and check yourself at the end of the Gloria: your last note should land back on the same note you started on. If it doesn’t, the usual culprit is the Gloria sagging flat as it descends, so keep each new bar’s first note bright.</p>
+  </section>
+</main>
+
+<footer class="wrap">
+  For printed parts, the Choral Public Domain Library has free SATB editions where the soprano line is this melody.
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/abcjs@6.4.4/dist/abcjs-basic-min.js"></script>
+<script>
+(function(){
+  const TUNE = (clef) => `X:1
+M:4/4
+L:1/4
+%%vocalfont EB Garamond 15
+K:G ${clef}
+G G A/G/F/E/ | D3 D | E G G F | G2 G2 |
+w: 1.~Ding dong! mer-ri-ly on high, in heav’n the bells are ring-ing:
+w: 2.~E’en so here be-low, be-low, let stee-ple bells be swung-en,
+w: 3.~Pray you, du-ti-ful-ly prime your ma-tin chime, ye ring-ers;
+G G A/G/F/E/ | D3 D | E G G F | G2 G2 |]
+w: Ding dong! ve-ri-ly the sky is riv’n with an-gel sing-ing.
+w: and i-o, i-o, i-o, by priest and peo-ple sung-en.
+w: may you beau-ti-ful-ly rime your eve-time song, ye sing-ers.
+|: d>c B/c/d/B/ | c>B A/B/c/A/ | B>A G/A/B/G/ | A>G F/G/A/F/ |
+w: Glo-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+G>F E/F/G/E/ | F>E D D | E G G F | G2 G2 :|
+w: _ _ _ _ _ _ ri-_ a, Ho-san-na in ex-cel-sis!
+`;
+
+  // key options: semitones from G, key name, name of the range note (the key's dominant)
+  const KEYS = [
+    [-6,'D♭ major','A♭'],[-5,'D major','A'],[-4,'E♭ major','B♭'],[-3,'E major','B'],
+    [-2,'F major','C'],[-1,'F♯ major','C♯'],[0,'G major','D'],[1,'A♭ major','E♭'],
+    [2,'A major','E'],[3,'B♭ major','F'],[4,'B major','F♯'],[5,'C major','G']
+  ];
+
+  const $ = id => document.getElementById(id);
+  const playBtn=$('play'), pitchBtn=$('pitch'), keySel=$('key'), voiceSel=$('voice'),
+        sectionSel=$('section'), tempo=$('tempo'), tempoVal=$('tempoVal'), loopBox=$('loop'), kLabel=$('kLabel'), kLine=$('kLine');
+
+  const store = {
+    get(k){ try{ return localStorage.getItem('ddm:'+k); }catch(e){ return null; } },
+    set(k,v){ try{ localStorage.setItem('ddm:'+k,v); }catch(e){} }
+  };
+
+  function updateKeyLabels(){
+    const low = voiceSel.value==='low';
+    keySel.innerHTML='';
+    KEYS.forEach(([t,name,rn])=>{
+      const lo = 62+t-(low?12:0), hi = 74+t-(low?12:0);
+      const o=document.createElement('option');
+      o.value=t; o.textContent=`${name} (${rn}${Math.floor(lo/12)-1} to ${rn}${Math.floor(hi/12)-1})`;
+      keySel.appendChild(o);
+    });
+  }
+
+  // restore preferences
+  const sv = store.get('voice'); if (sv==='low'||sv==='high') voiceSel.value=sv;
+  updateKeyLabels();
+  const sk = store.get('key'); keySel.value = (sk!==null && KEYS.some(k=>String(k[0])===sk)) ? sk : '0';
+  const st = store.get('tempo'); if (st && +st>=50 && +st<=160) tempo.value=st;
+  tempoVal.textContent = tempo.value;
+
+  // melody data, from the untransposed tune: pitch, length and the syllable for each verse
+  const STEPS=[0,2,4,6,7,9,11]; // G major: F is sharp
+  const base=[];
+  (function(){
+    const t = ABCJS.parseOnly(TUNE(''))[0];
+    t.lines.forEach(l=>{ if(!l.staff) return; l.staff[0].voices[0].forEach(e=>{
+      if(e.el_type==='note' && !e.rest){
+        const p=e.pitches[0].pitch, oct=Math.floor(p/7), deg=((p%7)+7)%7;
+        const syl=(e.lyric||[]).map(x=>({s: x.syllable && x.syllable!=='_' ? x.syllable.replace(/^\d\.\s*/,'') : '', d:x.divider}));
+        base.push({midi:60+12*oct+STEPS[deg], beats:e.duration*4, syl});
+      }
+    });});
+  })();
+  const range=(a,b)=>Array.from({length:b-a+1},(_,i)=>a+i);
+  const VERSE=range(0,27), GLORIA=range(28,67);
+  const phraseOf=i=> i<14?'A' : i<28?'B' : 'G';
+  const verseLyric=(i,verse)=> phraseOf(i)==='G' ? 0 : verse-1;
+
+  function sequence(sec){
+    const s=[]; let block=0;
+    const add=(arr,label,verse)=>{ block++; arr.forEach(i=>s.push({i,label,verse,block})); };
+    if(sec==='verse') add(VERSE,'Verse',1);
+    else if(sec==='gloria') add(GLORIA,'Gloria',1);
+    else if(sec==='one'){ add(VERSE,'Verse 1',1); add(GLORIA,'Gloria',1); add(GLORIA,'Gloria again',1); }
+    else for(let v=1;v<=3;v++){ add(VERSE,'Verse '+v,v); add(GLORIA,'Gloria',v); add(GLORIA,'Gloria again',v); }
+    return s;
+  }
+
+  // rendering
+  let noteEls=[], byStart=new Map(), lyricOf=[], lineOf=[];
+  function inkColor(){ return getComputedStyle(document.documentElement).getPropertyValue('--ink').trim()||'#1C2B2A'; }
+  function render(){
+    if(typeof stop==='function') stop();
+    const scoreEl=$('score');
+    const w=Math.min(scoreEl.parentElement.clientWidth-20, 860);
+    const narrow=w<560;
+    const clef = voiceSel.value==='low' ? 'clef=treble-8' : '';
+    const visual = ABCJS.renderAbc('score', TUNE(clef), {
+      add_classes:true, foregroundColor:'currentColor', selectionColor: inkColor(),
+      visualTranspose: parseInt(keySel.value,10),
+      staffwidth: Math.max(280, w-10),
+      wrap:{minSpacing:1.5, maxSpacing:2.7, preferredMeasuresPerLine: narrow?2:4},
+      paddingleft:0, paddingright:0, paddingtop:0,
+      clickListener:onNoteClick
+    })[0];
+    noteEls=[]; byStart=new Map(); lineOf=[];
+    visual.lines.forEach((l,li)=>{ if(!l.staff) return; l.staff[0].voices[0].forEach(e=>{
+      if(e.el_type==='note' && !e.rest){ byStart.set(e.startChar, noteEls.length); noteEls.push(e); lineOf.push(li); }
+    });});
+    const svg=scoreEl.querySelector('svg');
+    lyricOf=noteEls.map(e=>{
+      const g=e.abselem&&e.abselem.elemset&&e.abselem.elemset[0]; if(!g||!svg) return [];
+      const c=(g.getAttribute('class')||'').split(/\s+/).filter(x=>/^abcjs-(l|m|v|n)\d+$/.test(x));
+      return c.length<4 ? [] : [...svg.querySelectorAll('.abcjs-lyric.'+c.join('.'))];
+    });
+  }
+  function mark(i,verseIdx,name,on){
+    const e=noteEls[i]; if(e&&e.abselem&&e.abselem.elemset) e.abselem.elemset.forEach(x=>x&&x.classList&&x.classList.toggle(name,on));
+    const txt=(lyricOf[i]||[])[0]; if(!txt) return;
+    const sp=txt.querySelectorAll('tspan'); const target=(sp.length>1 ? sp[verseIdx] : null) || txt;
+    target.classList.toggle(name,on);
+  }
+
+  // audio
+  let ctx=null, master=null;
+  function audio(){
+    if(!ctx){
+      try{ if(navigator.audioSession) navigator.audioSession.type='playback'; }catch(e){}
+      ctx=new (window.AudioContext||window.webkitAudioContext)();
+      master=ctx.createGain(); master.gain.value=0.9;
+      const lp=ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=2600;
+      master.connect(lp); lp.connect(ctx.destination);
+    }
+    if(ctx.state==='suspended') ctx.resume();
+    return ctx;
+  }
+  const hz=m=>440*Math.pow(2,(m-69)/12);
+  let voices=[];
+  function tone(midi,start,dur,vol){
+    const o=ctx.createOscillator(), o2=ctx.createOscillator(), g=ctx.createGain();
+    o.type='triangle'; o2.type='sine';
+    o.frequency.value=hz(midi); o2.frequency.value=hz(midi)*2;
+    const g2=ctx.createGain(); g2.gain.value=0.12;
+    o.connect(g); o2.connect(g2); g2.connect(g); g.connect(master);
+    const v=vol||0.28, end=start+Math.max(0.08,dur);
+    g.gain.setValueAtTime(0,start);
+    g.gain.linearRampToValueAtTime(v,start+0.025);
+    g.gain.linearRampToValueAtTime(v*0.72,start+0.18);
+    g.gain.setValueAtTime(v*0.72,Math.max(start+0.18,end-0.05));
+    g.gain.linearRampToValueAtTime(0,end);
+    o.start(start); o2.start(start); o.stop(end+0.05); o2.stop(end+0.05);
+    voices.push(o,o2);
+  }
+  function silence(){ voices.forEach(o=>{ try{o.stop();}catch(e){} }); voices=[]; }
+  const shift=()=>parseInt(keySel.value,10)-(voiceSel.value==='low'?12:0);
+
+  // karaoke line
+  let kKey='', kSpans=[];
+  function showPhrase(ev){
+    const key=ev.block+':'+phraseOf(ev.i); if(key===kKey) return;
+    kKey=key; kLine.innerHTML=''; kSpans=[];
+    const ph=phraseOf(ev.i), idxs = ph==='A'?range(0,13) : ph==='B'?range(14,27) : GLORIA;
+    const vl=verseLyric(ev.i, ev.verse);
+    idxs.forEach(i=>{ const s=base[i].syl[vl]||base[i].syl[0]; if(!s||!s.s) return;
+      const sp=document.createElement('span'); sp.textContent=s.s+(s.d==='-'?'':' '); kLine.appendChild(sp); kSpans.push({i,sp}); });
+    kLabel.textContent=ev.label;
+  }
+  function progress(cur){
+    kSpans.forEach((k,j)=>{ const nx=kSpans[j+1]; const own=cur>=k.i && (!nx||cur<nx.i);
+      k.sp.classList.toggle('now',own); k.sp.classList.toggle('done',cur>k.i && !own); });
+  }
+  function resetKaraoke(){ kKey=''; kSpans=[]; kLabel.textContent=''; kLine.innerHTML='<span class="k-hint">Press Play, or tap a note to start from there.</span>'; }
+
+  // playback
+  let playing=false, events=[], raf=0, cur=null, sung=[], fromK=0, seq=[], lastLine=-1;
+  const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function clearMarks(){
+    if(cur) mark(cur.i, verseLyric(cur.i,cur.verse), 'playing', false);
+    sung.forEach(e=>mark(e.i, verseLyric(e.i,e.verse), 'sung', false)); sung=[]; cur=null; lastLine=-1;
+  }
+  function play(from){
+    audio(); silence(); cancelAnimationFrame(raf); clearMarks();
+    seq=sequence(sectionSel.value); fromK=Math.min(from||0, seq.length-1);
+    const spb=60/parseInt(tempo.value,10);
+    let t=ctx.currentTime+0.12; events=[];
+    for(let k=fromK;k<seq.length;k++){
+      const n=base[seq[k].i], d=n.beats*spb;
+      tone(n.midi+shift(), t, d*0.94);
+      events.push(Object.assign({k, start:t, end:t+d}, seq[k]));
+      t+=d;
+    }
+    playing=true; playBtn.textContent='Stop';
+    tick();
+  }
+  function stop(){
+    const was=playing||cur;
+    playing=false; silence(); cancelAnimationFrame(raf); clearMarks();
+    playBtn.textContent='Play'; if(was) resetKaraoke();
+  }
+  function follow(i){
+    const e=noteEls[i]; const g=e&&e.abselem&&e.abselem.elemset&&e.abselem.elemset[0]; if(!g) return;
+    const r=g.getBoundingClientRect(), top=document.querySelector('.bar').getBoundingClientRect().bottom;
+    if(r.top<top+10 || r.bottom>window.innerHeight-40) window.scrollTo({top:window.scrollY+r.top-top-70, behavior: reduceMotion?'auto':'smooth'});
+  }
+  function tick(){
+    if(!playing) return;
+    const now=ctx.currentTime;
+    const last=events[events.length-1];
+    if(!last || now>=last.end){ if(loopBox.checked) play(fromK); else stop(); return; }
+    let lo=0, hi=events.length-1, a=-1;
+    while(lo<=hi){ const m=(lo+hi)>>1; if(events[m].start<=now){ a=m; lo=m+1; } else hi=m-1; }
+    const ev = a>=0 ? events[a] : null;
+    if(ev && ev!==cur){
+      const samePhrase = cur && cur.block===ev.block && phraseOf(cur.i)===phraseOf(ev.i);
+      if(cur){ mark(cur.i, verseLyric(cur.i,cur.verse), 'playing', false);
+        if(samePhrase){ mark(cur.i, verseLyric(cur.i,cur.verse), 'sung', true); sung.push(cur); } }
+      if(!samePhrase){ sung.forEach(e=>mark(e.i, verseLyric(e.i,e.verse), 'sung', false)); sung=[]; }
+      mark(ev.i, verseLyric(ev.i,ev.verse), 'playing', true);
+      cur=ev;
+      showPhrase(ev); progress(ev.i);
+      if(lineOf[ev.i]!==lastLine){ lastLine=lineOf[ev.i]; follow(ev.i); }
+    }
+    raf=requestAnimationFrame(tick);
+  }
+  function currentK(){ return cur ? cur.k : 0; }
+
+  function onNoteClick(abcelem){
+    const idx=byStart.get(abcelem && abcelem.startChar);
+    if(idx===undefined) return;
+    const s=sequence(sectionSel.value);
+    let cands=[]; s.forEach((e,k)=>{ if(e.i===idx) cands.push(k); });
+    if(!cands.length){ // note not in the chosen section: play it within one full verse
+      sectionSel.value = 'one'; return onNoteClick(abcelem);
+    }
+    let k=cands[0];
+    if(playing && cur){
+      let bs=cur.k; while(bs>0 && s[bs-1].block===cur.block) bs--;
+      const later=cands.find(c=>c>=bs); if(later!==undefined) k=later;
+    }
+    play(k);
+  }
+
+  playBtn.addEventListener('click',()=>{ playing?stop():play(0); });
+  pitchBtn.addEventListener('click',()=>{
+    if(playing) stop();
+    audio();
+    const r=67+shift(), t=ctx.currentTime+0.05;
+    tone(r,t,0.45,0.22); tone(r+4,t+0.45,0.45,0.22); tone(r+7,t+0.9,0.45,0.22);
+    tone(r,t+1.4,1.6,0.3);
+    kLabel.textContent='First note'; kLine.innerHTML='<span class="now">Ding</span>';
+    setTimeout(()=>{ if(!playing) resetKaraoke(); },3200);
+  });
+  keySel.addEventListener('change',()=>{ store.set('key',keySel.value); render(); });
+  voiceSel.addEventListener('change',()=>{ const k=keySel.value; store.set('voice',voiceSel.value); updateKeyLabels(); keySel.value=k; render(); });
+  sectionSel.addEventListener('change',()=>{ if(playing) play(0); });
+  tempo.addEventListener('input',()=>{ tempoVal.textContent=tempo.value; });
+  tempo.addEventListener('change',()=>{ store.set('tempo',tempo.value); if(playing) play(currentK()); });
+
+  let rt=0, lastW=0;
+  window.addEventListener('resize',()=>{ clearTimeout(rt); rt=setTimeout(()=>{
+    const w=$('score').parentElement.clientWidth; if(Math.abs(w-lastW)<20) return; lastW=w; render();
+  },200); });
+  if (window.matchMedia) {
+    const mq = window.matchMedia('(prefers-color-scheme: dark)');
+    if (mq.addEventListener) mq.addEventListener('change', ()=>{ if(!playing) render(); });
+  }
+
+  function start(){ lastW=$('score').parentElement.clientWidth; render(); }
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(start); else start();
+})();
+</script>
+</body>
+</html>

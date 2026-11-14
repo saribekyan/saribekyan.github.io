@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ave Maria (Bach/Gounod) — sing-along score</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EEF1F4; --page:#FCFDFD; --ink:#1B2533; --muted:#556172; --accent:#2F5A8A; --accent-ink:#FFFFFF; --rule:#CBD3DD;
+  --sung:#86A2C2; --piano:#9A6A1F;
+  color-scheme: light; box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0F141B; --page:#161D27; --ink:#E5EAF0; --muted:#9AA6B5; --accent:#8FB4E0; --accent-ink:#0C1520; --rule:#2A3443;
+    --sung:#4F6A88; --piano:#D6A657; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0F141B; --page:#161D27; --ink:#E5EAF0; --muted:#9AA6B5; --accent:#8FB4E0; --accent-ink:#0C1520; --rule:#2A3443;
+  --sung:#4F6A88; --piano:#D6A657; color-scheme: dark;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"EB Garamond", Garamond, "Times New Roman", serif;font-size:19px;line-height:1.55}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--page)}
+.wrap{max-width:900px;margin:0 auto;padding:0 18px}
+header{padding:44px 0 22px}
+h1{font-weight:500;font-size:clamp(2.2rem,6.5vw,3.5rem);line-height:1.02;margin:0 0 4px;letter-spacing:-0.01em}
+.sub{font-style:italic;font-size:1.25rem;margin:0 0 12px;color:var(--muted)}
+.lede{margin:0;max-width:62ch}
+.credit{margin:8px 0 0;color:var(--muted);font-size:0.9rem;font-style:italic;max-width:68ch}
+
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--page);border-bottom:1px solid var(--rule);border-top:1px solid var(--rule)}
+.bar .wrap{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;padding-top:10px;padding-bottom:10px}
+.btns{display:flex;gap:8px}
+button{font:inherit;font-size:1rem;border-radius:6px;cursor:pointer;padding:6px 14px;border:1px solid var(--rule);background:transparent;color:var(--ink)}
+button.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600;min-width:5.5em}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+label.ctl{display:flex;align-items:center;gap:6px;font-size:0.95rem;color:var(--muted)}
+select{font:inherit;font-size:0.95rem;color:var(--ink);background:var(--page);border:1px solid var(--rule);border-radius:6px;padding:4px 6px;max-width:100%}
+input[type=range]{accent-color:var(--accent);width:110px}
+input[type=checkbox]{accent-color:var(--accent)}
+.tempo-val{min-width:2.4em;color:var(--ink);font-variant-numeric:tabular-nums}
+
+.karaoke{flex-basis:100%;display:flex;align-items:baseline;gap:12px;min-height:2.1em;border-top:1px solid var(--rule);padding-top:8px;margin-top:2px}
+.k-label{font-size:0.85rem;color:var(--muted);white-space:nowrap;min-width:5.5em}
+.k-line{font-size:1.45rem;line-height:1.25;color:var(--muted)}
+.k-line .s{transition:color .12s}
+.k-line .done{color:var(--accent)}
+.k-line .now{color:var(--accent);font-weight:700;text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:4px}
+.k-hint{font-size:0.95rem;color:var(--muted);font-style:italic}
+
+main{padding:22px 0 40px}
+.sheet{background:var(--page);border:1px solid var(--rule);border-radius:4px;padding:18px 10px 10px;overflow-x:auto}
+#score{color:var(--ink)}
+#score svg{display:block;margin:0 auto}
+#score .abcjs-note,#score .abcjs-lyric{cursor:pointer}
+#score .sung,#score .sung *{fill:var(--sung) !important}
+#score .pplay,#score .pplay *{fill:var(--piano) !important}
+#score .playing,#score .playing *{fill:var(--accent) !important}
+#score text.playing{font-weight:700}
+.hint{color:var(--muted);font-size:0.9rem;margin:8px 2px 0}
+
+section.notes{max-width:64ch;margin-top:34px}
+section.notes h2{font-weight:500;font-size:1.5rem;margin:28px 0 6px}
+section.notes p{margin:0 0 12px}
+.text{display:grid;grid-template-columns:1fr 1fr;gap:4px 24px;margin:6px 0 12px}
+.text p{margin:0}
+.text .en{color:var(--muted);font-style:italic}
+.say{color:var(--muted)}
+footer{color:var(--muted);font-size:0.85rem;padding:10px 0 40px;max-width:68ch}
+footer a{color:var(--accent)}
+@media (max-width:600px){
+  body{font-size:18px}
+  header{padding-top:28px}
+  input[type=range]{width:90px}
+  .text{grid-template-columns:1fr}
+  .text .en{margin-bottom:6px}
+  .k-line{font-size:1.25rem}
+  .k-label{min-width:0}
+}
+@media (prefers-reduced-motion: reduce){ .k-line .s{transition:none} }
+</style>
+<link rel="stylesheet" href="/theme.css">
+</head>
+<body>
+<div class="home-bar"><a href="/">← hayk.saribekyan.me</a></div>
+<header class="wrap">
+  <h1>Ave Maria</h1>
+  <p class="sub">Bach / Gounod</p>
+  <p class="lede">A sing-along score: the notes and words light up as they go by. Tap any note, in the voice or the piano, to start from there.</p>
+  <p class="credit">Melody: Charles Gounod (vocal version 1859), set over J. S. Bach’s Prelude in C major, BWV 846, with the extra bar Gounod used. Text: the Latin Hail Mary.</p>
+</header>
+
+<div class="bar">
+  <div class="wrap">
+    <div class="btns">
+      <button id="play" class="primary" type="button">Play</button>
+      <button id="pitch" type="button" title="Plays the key chord, then your first note">Starting note</button>
+    </div>
+    <label class="ctl">Key <select id="key"></select></label>
+    <label class="ctl">Voice
+      <select id="voice">
+        <option value="high">Higher (as written)</option>
+        <option value="low">Lower (octave down)</option>
+      </select>
+    </label>
+    <label class="ctl">Hear
+      <select id="mix">
+        <option value="both">Melody and piano</option>
+        <option value="piano">Piano only</option>
+        <option value="melody">Melody only</option>
+      </select>
+    </label>
+    <label class="ctl">Play
+      <select id="section">
+        <option value="all">Whole piece</option>
+        <option value="s1">Ave Maria … Dominus tecum</option>
+        <option value="s2">Benedicta tu … Jesus</option>
+        <option value="s3">Sancta Maria … peccatoribus</option>
+        <option value="s4">Nunc et in hora … Amen</option>
+      </select>
+    </label>
+    <label class="ctl">Tempo <input id="tempo" type="range" min="40" max="96" step="2" value="66"><span class="tempo-val" id="tempoVal">66</span></label>
+    <label class="ctl"><input id="showPiano" type="checkbox"> Show piano part</label>
+    <label class="ctl"><input id="loop" type="checkbox"> Loop</label>
+    <div class="karaoke" aria-live="off"><span class="k-label" id="kLabel"></span><span class="k-line" id="kLine"><span class="k-hint">Press Play, or tap a note to start from there.</span></span></div>
+  </div>
+</div>
+
+<main class="wrap">
+  <div class="sheet"><div id="score"></div></div>
+  <p class="hint">Blue is the voice; with the piano part shown, the piano notes light up in gold. The piano plays four bars on its own before you come in.</p>
+
+  <section class="notes">
+    <h2>The text</h2>
+    <div class="text">
+      <p>Ave Maria, gratia plena,<br>Dominus tecum.<br>Benedicta tu in mulieribus,<br>et benedictus fructus ventris tui, Jesus.</p>
+      <p class="en">Hail Mary, full of grace,<br>the Lord is with thee.<br>Blessed art thou among women,<br>and blessed is the fruit of thy womb, Jesus.</p>
+      <p>Sancta Maria, sancta Maria, Maria,<br>ora pro nobis, nobis peccatoribus,<br>nunc et in hora, in hora mortis nostrae.<br>Amen.</p>
+      <p class="en">Holy Mary, holy Mary, Mary,<br>pray for us, for us sinners,<br>now and in the hour, the hour of our death.<br>Amen.</p>
+    </div>
+    <p>Sung in church Latin, the vowels stay pure and open. A few words trip people up: <span class="say">gratia</span> is GRAH-tsee-ah, <span class="say">Jesus</span> is YEH-soos, <span class="say">peccatoribus</span> is peh-kah-TOH-ree-boos, <span class="say">mulieribus</span> is moo-lee-EH-ree-boos, and <span class="say">nostrae</span> is NOH-streh.</p>
+
+    <h2>Choosing a key</h2>
+    <p>The line spans a thirteenth, from the low notes on “Dominus”, “benedictus” and the end of “nostrae” up to the climax on “hora” about two-thirds of the way through. Choose the key by that top note: it should feel exciting, not desperate. G major is Gounod’s own key for soprano; altos and baritones often sing it in C or D. If you have a low voice, set Voice to Lower so the score reads an octave down.</p>
+
+    <h2>Practising</h2>
+    <p>Start with Melody and piano until the tune is secure, then switch to Piano only and sing it yourself while the words keep lighting up. Work phrase by phrase with the Play menu and Loop, or tap the note where you want to start. The last section, from “nunc et in hora”, carries the big climax and needs a full breath before it. Every phrase ends with a rest, so breathe there, and let the long notes on “A-” and “Ma-” float rather than push.</p>
+  </section>
+</main>
+
+<footer class="wrap">
+  For printed scores with the full piano part, the <a href="https://www.cpdl.org/wiki/index.php/Ave_Maria_(Bach-Gounod)" target="_blank" rel="noopener">Choral Public Domain Library</a> has free editions in G.
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/abcjs@6.4.4/dist/abcjs-basic-min.js"></script>
+<script>
+(function(){
+// ---- Ave Maria score data + ABC generator (shared by page and tests) ----
+const VOCAL = [
+ ["Z4 | E8 | F6 z F | G6 D2 | E4- E z z2 |", "A- ve Ma- ri-_ a,_", 1, 8],
+ ["A4- A A, B, C | D3 E D2 z2 | G4- G G, A, B, | C3 D C2 z2 |", "gra-_ _ ti- a ple-_ na, Do-_ _ mi- nus te-_ cum,", 9, 12],
+ ["c4- c C D E | ^F3 E D2 A,2 | B,4 z2 D2 | E4- E E F G | A7/2 A,/2 A,2 z2 |", "be-_ _ _ ne- dic-_ _ ta tu in mu-_ _ _ li- e- ri- bus,", 13, 17],
+ ["D4- D D E F | G4 G,2 z2 | C4- C C D E | F4- F F G A | B3 A G2 D2 | E4- E z z2 |", "et_ _ be- ne- dic- tus fruc-_ _ _ tus ven-_ _ _ tris tu-_ i, Je- sus._", 18, 23],
+ ["G4 E2 z3/2 E/2 | A4 A,2 z2 | A4 C2 z3/2 A/2 | c4 _E2 z3/2 c/2 | c4 D2 z2 |", "San- cta Ma- ri- a, san- cta Ma- ri- a, Ma- ri- a,", 24, 28],
+ ["D4- D D C B, | G3 E C2 z2 | F4- F F E D | d3 B G2 z2 |", "O-_ _ ra pro no-_ bis, no-_ bis pec- ca- to- ri- bus,", 29, 32],
+ ["A4- A A B c | e4- e c G E | D4- D A B A | G d B G F D B, G, |", "nunc_ _ et in ho-_ _ ra, in ho-_ _ _ ra mor-_ tis_ nos-_ trae._", 33, 36],
+ ["C8 | C4 z4 | G8 | G6 z2 |]", "A- men! A- men!", 37, 40]
+];
+// Bach's prelude as Gounod used it: per bar [bass, tenor, upper1, upper2, upper3]
+const PRELUDE = {
+  1:[60,64,67,72,76], 2:[60,62,69,74,77], 3:[59,62,67,74,77], 4:[60,64,67,72,76],
+  5:[60,64,67,72,76], 6:[60,62,69,74,77], 7:[59,62,67,74,77], 8:[60,64,67,72,76],
+  9:[60,64,69,76,81], 10:[60,62,66,69,74], 11:[59,62,67,74,79], 12:[59,60,64,67,72],
+  13:[57,60,64,67,72], 14:[50,57,62,66,72], 15:[55,59,62,67,71], 16:[55,58,64,67,73],
+  17:[53,57,62,69,74], 18:[53,56,62,65,71], 19:[52,55,60,67,72], 20:[52,53,57,60,65],
+  21:[50,53,57,60,65], 22:[43,50,55,59,65], 23:[48,52,55,60,64], 24:[48,55,58,60,64],
+  25:[41,53,57,60,64], 26:[42,48,57,60,63], 27:[43,51,59,60,63], 28:[44,53,59,60,62],
+  29:[43,53,55,59,62], 30:[43,52,55,60,64], 31:[43,50,55,60,65], 32:[43,50,55,59,65],
+  33:[43,51,57,60,66], 34:[43,52,55,60,67], 35:[43,50,55,60,65], 36:[43,50,55,59,65],
+  37:[36,48,55,58,64]
+};
+const RUN38=[53,57,60,57,60,65,60,57,60,57,53,57,53,50];
+const RUN39=[67,71,74,77,74,71,74,71,67,71,62,65,64,62];
+
+// piano element lists (in notation order) with times in beats from the start of bar 1
+const PIANO = (function(){
+  const rh=[], lh=[];
+  for(let b=1;b<=40;b++){
+    const base=(b-1)*4;
+    if(PRELUDE[b]){
+      const [bs,tn,u1,u2,u3]=PRELUDE[b];
+      for(const h of [0,2]){
+        lh.push({t:base+h, dur:2, m:[bs,tn], roll:true});
+        [u1,u2,u3,u1,u2,u3].forEach((u,i)=>rh.push({t:base+h+0.5+i*0.25, dur:0.25, m:[u]}));
+      }
+    } else if(b===38){
+      lh.push({t:base, dur:4, m:[36,48], roll:true});
+      RUN38.forEach((u,i)=>rh.push({t:base+0.5+i*0.25, dur:0.25, m:[u]}));
+    } else if(b===39){
+      lh.push({t:base, dur:4, m:[36,47], roll:true});
+      RUN39.forEach((u,i)=>rh.push({t:base+0.5+i*0.25, dur:0.25, m:[u]}));
+    } else if(b===40){
+      lh.push({t:base, dur:4, m:[36,43,48], roll:true});
+      rh.push({t:base, dur:4, m:[64,67,72], roll:true});
+    }
+  }
+  return {rh, lh};
+})();
+
+const SPELL=[['C',0],['C',1],['D',0],['E',-1],['E',0],['F',0],['F',1],['G',0],['A',-1],['A',0],['B',-1],['B',0]];
+function abcNote(m, acc){
+  const [L,a]=SPELL[m%12], oct=Math.floor(m/12)-1, key=L+oct;
+  let pre='';
+  if((acc[key]||0)!==a){ pre = a===1?'^':a===-1?'_':'='; acc[key]=a; }
+  const name = oct>=5 ? L.toLowerCase()+"'".repeat(oct-5) : L+",".repeat(Math.max(0,4-oct));
+  return pre+name;
+}
+function pianoBars(){
+  const rh={}, lh={};
+  for(let b=1;b<=40;b++){
+    const ra={}, la={};
+    if(PRELUDE[b]){
+      const [bs,tn,u1,u2,u3]=PRELUDE[b];
+      const half=()=>'z '+[u1,u2,u3,u1,u2,u3].map(u=>abcNote(u,ra)+'/').join('');
+      const ch=()=>'['+abcNote(bs,la)+abcNote(tn,la)+']4';
+      rh[b]=half()+' '+half(); lh[b]=ch()+' '+ch();
+    } else if(b===38){
+      rh[b]='[K:clef=bass] z '+RUN38.map(u=>abcNote(u,ra)+'/').join('');
+      lh[b]='['+abcNote(36,la)+abcNote(48,la)+']8';
+    } else if(b===39){
+      rh[b]='[K:clef=treble] z '+RUN39.map(u=>abcNote(u,ra)+'/').join('');
+      lh[b]='['+abcNote(36,la)+abcNote(47,la)+']8';
+    } else if(b===40){
+      rh[b]='['+[64,67,72].map(u=>abcNote(u,ra)).join('')+']8';
+      lh[b]='['+[36,43,48].map(u=>abcNote(u,la)).join('')+']8';
+    }
+  }
+  return {rh,lh};
+}
+function buildAbc(lowVoice, withPiano){
+  const clef = lowVoice ? 'treble-8' : 'treble';
+  if(!withPiano){
+    let s=`X:1\nM:C\nL:1/8\n%%vocalfont EB Garamond 14\nK:C clef=${clef}\n`;
+    VOCAL.forEach(([mus,ly])=>{ s+=mus+'\nw: '+ly+'\n'; });
+    return s;
+  }
+  const P=pianoBars();
+  let s=`X:1\nM:C\nL:1/8\n%%vocalfont EB Garamond 14\n%%staves 1 {2 3}\nV:1 clef=${clef}\nV:2 clef=treble\nV:3 clef=bass\nK:C\n`;
+  VOCAL.forEach(([mus,ly,b0,b1],gi)=>{
+    const last = gi===VOCAL.length-1;
+    const end = last ? ' |]' : ' |';
+    const rhs=[], lhs=[];
+    for(let b=b0;b<=b1;b++){ rhs.push(P.rh[b]); lhs.push(P.lh[b]); }
+    s+='[V:1] '+mus.replace('Z4 |','z8 | z8 | z8 | z8 |')+'\nw: '+ly+'\n';
+    s+='[V:2] '+rhs.join(' | ')+end+'\n';
+    s+='[V:3] '+lhs.join(' | ')+end+'\n';
+  });
+  return s;
+}
+  const SECTIONS = { all:[1,40], s1:[5,12], s2:[13,23], s3:[24,32], s4:[33,40] };
+  const KEYS = [
+    [-3,'A major','E','C♯'],[-2,'B♭ major','F','D'],[-1,'B major','F♯','D♯'],[0,'C major','G','E'],
+    [1,'D♭ major','A♭','F'],[2,'D major','A','F♯'],[3,'E♭ major','B♭','G'],[4,'E major','B','G♯'],
+    [5,'F major','C','A'],[6,'F♯ major','C♯','A♯'],[7,'G major','D','B'],[8,'A♭ major','E♭','C'],[9,'A major','E','C♯']
+  ];
+  const $ = id => document.getElementById(id);
+  const playBtn=$('play'), pitchBtn=$('pitch'), keySel=$('key'), voiceSel=$('voice'), mixSel=$('mix'),
+        sectionSel=$('section'), tempo=$('tempo'), tempoVal=$('tempoVal'), loopBox=$('loop'), pianoBox=$('showPiano'),
+        kLabel=$('kLabel'), kLine=$('kLine');
+  const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const store = {
+    get(k){ try{ return localStorage.getItem('avem:'+k); }catch(e){ return null; } },
+    set(k,v){ try{ localStorage.setItem('avem:'+k,v); }catch(e){} }
+  };
+  function updateKeyLabels(){
+    const low=voiceSel.value==='low';
+    keySel.innerHTML='';
+    KEYS.forEach(([t,name,lo,hi])=>{
+      const l=55+t-(low?12:0), h=76+t-(low?12:0);
+      const o=document.createElement('option'); o.value=String(t);
+      o.textContent=`${name} (${lo}${Math.floor(l/12)-1} to ${hi}${Math.floor(h/12)-1})${t===7?', Gounod’s key':''}`;
+      keySel.appendChild(o);
+    });
+  }
+  const semis=()=>parseInt(keySel.value,10);
+  const sv=store.get('voice'); if(sv==='low'||sv==='high') voiceSel.value=sv;
+  updateKeyLabels();
+  const sk=store.get('key'); keySel.value=(sk && KEYS.some(k=>String(k[0])===sk))?sk:'7';
+  const sm=store.get('mix'); if(sm && [...mixSel.options].some(o=>o.value===sm)) mixSel.value=sm;
+  const st=store.get('tempo'); if(st && +st>=40 && +st<=96) tempo.value=st;
+  tempoVal.textContent=tempo.value;
+  pianoBox.checked = store.get('piano')==='1';
+
+  // ---- melody timeline, syllables and phrases (from the voice-only score) ----
+  const DIA=[0,2,4,5,7,9,11];
+  const melody=[];
+  (function(){
+    const t=ABCJS.parseOnly(buildAbc(false,false))[0];
+    let time=0, bar=1, acc={};
+    t.lines.forEach((l,li)=>{ if(!l.staff) return; l.staff[0].voices[0].forEach(e=>{
+      if(e.el_type==='bar'){ bar++; acc={}; return; }
+      if(e.el_type!=='note') return;
+      const beats=e.duration*4;
+      if(e.rest){ if(e.rest.type==='multimeasure') bar+=(parseInt(e.rest.text,10)||1)-1; time+=beats; return; }
+      const p=e.pitches[0], oct=Math.floor(p.pitch/7), deg=((p.pitch%7)+7)%7;
+      if(p.accidental) acc[p.pitch]= p.accidental==='sharp'?1 : p.accidental==='flat'?-1 : 0;
+      const ly=(e.lyric&&e.lyric[0])||null;
+      const syl=ly && ly.syllable && ly.syllable!=='_' ? ly.syllable : '';
+      melody.push({midi:60+12*oct+DIA[deg]+(acc[p.pitch]||0), start:time, beats, bar, line:li,
+        tieStart:!!p.startTie, tieEnd:!!p.endTie, syl, div: ly?ly.divider:' '});
+      time+=beats;
+    });});
+  })();
+  const PIECE_END=160;
+
+  // ---- rendering ----
+  let vEls=[], rhEls=[], lhEls=[], clickBeat=new Map(), lyricOf=[], lineOfV=[], lineOfP=[];
+  const cssVar=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  function render(){
+    stop();
+    const scoreEl=$('score');
+    const w=Math.min(scoreEl.parentElement.clientWidth-20, 860);
+    const narrow=w<560, piano=pianoBox.checked;
+    const visual=ABCJS.renderAbc('score', buildAbc(voiceSel.value==='low', piano), {
+      add_classes:true, foregroundColor:'currentColor', selectionColor:cssVar('--ink')||'#1B2533',
+      visualTranspose:semis(), staffwidth:Math.max(280,w-10),
+      wrap:{minSpacing:piano?1.2:1.4, maxSpacing:2.6, preferredMeasuresPerLine: piano?(narrow?1:2):(narrow?2:4)},
+      paddingleft:0, paddingright:0, paddingtop:0, clickListener:onClick
+    })[0];
+    vEls=[]; rhEls=[]; lhEls=[]; lineOfV=[]; lineOfP=[]; clickBeat=new Map();
+    visual.lines.forEach((l,li)=>{ if(!l.staff) return; l.staff.forEach((s,si)=>{ const vo=s.voices[0]; vo.forEach(e=>{
+      if(e.el_type!=='note'||e.rest) return;
+      if(si===0){ vEls.push(e); lineOfV.push(li); }
+      else if(si===1){ rhEls.push(e); lineOfP.push(li); }
+      else if(si===2){ lhEls.push(e); }
+    }); }); });
+    vEls.forEach((e,i)=>{ if(melody[i]) clickBeat.set(e.startChar, melody[i].start); });
+    rhEls.forEach((e,i)=>{ if(PIANO.rh[i]) clickBeat.set(e.startChar, PIANO.rh[i].t); });
+    lhEls.forEach((e,i)=>{ if(PIANO.lh[i]) clickBeat.set(e.startChar, PIANO.lh[i].t); });
+    // lyric text elements share the note's line/measure/voice/position classes
+    const svg=scoreEl.querySelector('svg');
+    lyricOf = vEls.map(e=>{
+      const g=e.abselem&&e.abselem.elemset&&e.abselem.elemset[0]; if(!g||!svg) return [];
+      const cls=(g.getAttribute('class')||'').split(/\s+/).filter(c=>/^abcjs-(l|m|v|n)\d+$/.test(c));
+      if(cls.length<4) return [];
+      return [...svg.querySelectorAll('.abcjs-lyric.'+cls.join('.'))];
+    });
+  }
+  function cls(e,name,on){ if(e&&e.abselem&&e.abselem.elemset) e.abselem.elemset.forEach(x=>x&&x.classList&&x.classList.toggle(name,on)); }
+  function vMark(i,name,on){ cls(vEls[i],name,on); (lyricOf[i]||[]).forEach(x=>x.classList.toggle(name,on)); }
+
+  // ---- audio ----
+  let ctx=null, master=null;
+  function audio(){
+    if(!ctx){
+      try{ if(navigator.audioSession) navigator.audioSession.type='playback'; }catch(e){}
+      ctx=new (window.AudioContext||window.webkitAudioContext)();
+      master=ctx.createGain(); master.gain.value=0.9;
+      const lp=ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=3000;
+      master.connect(lp); lp.connect(ctx.destination);
+    }
+    if(ctx.state==='suspended') ctx.resume();
+    return ctx;
+  }
+  const hz=m=>440*Math.pow(2,(m-69)/12);
+  let live=[];
+  function track(nodes,end){ live.push({nodes,end}); if(live.length>300){ const now=ctx.currentTime; live=live.filter(v=>v.end>now); } }
+  function voiceTone(midi,start,dur,vol){
+    const o=ctx.createOscillator(), o2=ctx.createOscillator(), g=ctx.createGain(), g2=ctx.createGain();
+    o.type='triangle'; o2.type='sine'; o.frequency.value=hz(midi); o2.frequency.value=hz(midi)*2; g2.gain.value=0.12;
+    const nodes=[o,o2];
+    if(dur>0.7){ const lfo=ctx.createOscillator(), lg=ctx.createGain(); lfo.frequency.value=5.2; lg.gain.setValueAtTime(0,start); lg.gain.linearRampToValueAtTime(hz(midi)*0.004,start+0.5); lfo.connect(lg); lg.connect(o.frequency); lfo.start(start); lfo.stop(start+dur+0.1); nodes.push(lfo); }
+    o.connect(g); o2.connect(g2); g2.connect(g); g.connect(master);
+    const v=vol||0.26, end=start+Math.max(0.08,dur);
+    g.gain.setValueAtTime(0,start); g.gain.linearRampToValueAtTime(v,start+0.04);
+    g.gain.linearRampToValueAtTime(v*0.8,start+0.25); g.gain.setValueAtTime(v*0.8,Math.max(start+0.25,end-0.06)); g.gain.linearRampToValueAtTime(0,end);
+    o.start(start); o2.start(start); o.stop(end+0.05); o2.stop(end+0.05);
+    track(nodes,end);
+  }
+  function pianoTone(midi,start,hold,vol){
+    const o=ctx.createOscillator(), g=ctx.createGain();
+    o.type='triangle'; o.frequency.value=hz(midi); o.connect(g); g.connect(master);
+    const v=vol||0.07, h=Math.max(0.15,hold), end=start+h+0.4;
+    g.gain.setValueAtTime(0,start); g.gain.linearRampToValueAtTime(v,start+0.006);
+    g.gain.exponentialRampToValueAtTime(v*0.35,start+0.35);
+    g.gain.setTargetAtTime(v*0.05,start+0.35,Math.max(0.2,h*0.6));
+    g.gain.setTargetAtTime(0.0001,start+h,0.08);
+    o.start(start); o.stop(end); track([o],end);
+  }
+  function silence(){ live.forEach(v=>v.nodes.forEach(n=>{ try{n.stop();}catch(e){} })); live=[]; }
+  const melodyShift=()=>semis()-(voiceSel.value==='low'?12:0);
+
+  function sectionRange(){
+    const [b0,b1]=SECTIONS[sectionSel.value], piano=mixSel.value!=='melody';
+    let from=(b0-1)*4, to=b1*4;
+    if(sectionSel.value==='all' && !piano) from=16;
+    if(sectionSel.value!=='all' && piano) from-=4; // a bar of piano to lead in
+    if(piano && b1>=40) to+=2; // let the last chord ring
+    return [Math.max(0,from), to];
+  }
+  function buildEvents(from,to){
+    const ev=[], t=semis(), wantPiano=mixSel.value!=='melody', wantMelody=mixSel.value!=='piano';
+    if(wantPiano){
+      PIANO.lh.forEach(n=>{
+        if(n.t>=from && n.t<to){ n.m.forEach((m,k)=>ev.push({t:n.t+(n.m.length>2?k*0.04:k*0.25), kind:'p', m:m+t, hold:n.dur-(n.m.length>2?0:k*0.25), v:k===0?0.085:0.07})); }
+        else if(n.t<from && n.t+n.dur>from){ n.m.forEach((m,k)=>ev.push({t:from, kind:'p', m:m+t, hold:n.t+n.dur-from, v:0.07})); }
+      });
+      PIANO.rh.forEach(n=>{ if(n.t>=from && n.t<to) n.m.forEach((m,k)=>ev.push({t:n.t+k*0.04, kind:'p', m:m+t, hold:n.dur, v:n.m.length>1?0.06:0.06})); });
+    }
+    if(wantMelody){
+      melody.forEach((n,i)=>{
+        if(n.start<from-1e-6 || n.start>=to) return;
+        if(n.tieEnd && i>0 && melody[i-1].start>=from-1e-6) return;
+        let beats=n.beats, j=i; while(melody[j].tieStart && melody[j+1]){ j++; beats+=melody[j].beats; }
+        ev.push({t:n.start, kind:'m', m:n.midi+melodyShift(), beats});
+      });
+    }
+    ev.sort((a,b)=>a.t-b.t);
+    return ev;
+  }
+
+  // ---- karaoke line ----
+  let kPhrase=-1, kSpans=[];
+  function showPhrase(line){
+    if(line===kPhrase) return;
+    kPhrase=line; kLine.innerHTML=''; kSpans=[];
+    melody.forEach((n,i)=>{
+      if(n.line!==line || !n.syl) return;
+      const sp=document.createElement('span'); sp.className='s'; sp.textContent=n.syl+(n.div==='-'?'':' ');
+      kLine.appendChild(sp); kSpans.push({i,sp});
+    });
+  }
+  function progress(cur){ // cur: index of the sounding note, or -1 before the phrase starts
+    kSpans.forEach((k,j)=>{
+      const next=kSpans[j+1]; const ownsCur = cur>=k.i && (!next || cur<next.i);
+      k.sp.classList.toggle('now', ownsCur); k.sp.classList.toggle('done', cur>=0 && cur>=k.i && !ownsCur);
+    });
+  }
+  function progressRest(nextI){ kSpans.forEach(k=>{ k.sp.classList.remove('now'); k.sp.classList.toggle('done', k.i<nextI); }); }
+  function resetKaraoke(){ kPhrase=-1; kSpans=[]; kLabel.textContent=''; kLine.innerHTML='<span class="k-hint">Press Play, or tap a note to start from there.</span>'; }
+
+  // ---- playback ----
+  let playing=false, ev=[], idx=0, t0=0, spb=1, timer=0, raf=0, range=[0,0];
+  let curV=-1, curRH=-1, curLH=-1, sung=[], lastLine=-1;
+  function clearMarks(){
+    if(curV>=0) vMark(curV,'playing',false); sung.forEach(i=>vMark(i,'sung',false)); sung=[];
+    if(curRH>=0) cls(rhEls[curRH],'pplay',false); if(curLH>=0) cls(lhEls[curLH],'pplay',false);
+    curV=curRH=curLH=-1; lastLine=-1;
+  }
+  function play(from,to){
+    audio(); silence(); clearInterval(timer); cancelAnimationFrame(raf); clearMarks();
+    range=[from,to]; ev=buildEvents(from,to); idx=0;
+    spb=60/parseInt(tempo.value,10); t0=ctx.currentTime+0.15-from*spb;
+    playing=true; playBtn.textContent='Stop';
+    schedule(); timer=setInterval(schedule,40); tick();
+  }
+  function schedule(){
+    if(!playing) return;
+    const horizon=ctx.currentTime+0.6;
+    while(idx<ev.length){
+      const e=ev[idx], at=t0+e.t*spb; if(at>horizon) break;
+      if(e.kind==='p') pianoTone(e.m,at,e.hold*spb,e.v); else voiceTone(e.m,at,e.beats*spb*0.96);
+      idx++;
+    }
+  }
+  function stop(){
+    if(!playing && curV<0 && curRH<0) { return; }
+    playing=false; clearInterval(timer); cancelAnimationFrame(raf); silence(); clearMarks();
+    playBtn.textContent='Play'; resetKaraoke();
+  }
+  const nowBeat=()=>(ctx.currentTime-t0)/spb;
+  function activeIn(list,beat,getT,getD){ // binary search for the item sounding at beat
+    let lo=0, hi=list.length-1, ans=-1;
+    while(lo<=hi){ const mid=(lo+hi)>>1; if(getT(list[mid])<=beat+1e-6){ ans=mid; lo=mid+1; } else hi=mid-1; }
+    if(ans>=0 && beat < getT(list[ans])+getD(list[ans])) return ans;
+    return -1;
+  }
+  function follow(el){
+    if(!el||!el.abselem||!el.abselem.elemset||!el.abselem.elemset[0]) return;
+    const r=el.abselem.elemset[0].getBoundingClientRect();
+    const top=document.querySelector('.bar').getBoundingClientRect().bottom;
+    if(r.top<top+10 || r.bottom>window.innerHeight-40){
+      window.scrollTo({top:window.scrollY+r.top-top-70, behavior: reduceMotion?'auto':'smooth'});
+    }
+  }
+  function tick(){
+    if(!playing) return;
+    const beat=nowBeat();
+    if(beat>=range[1]){ if(loopBox.checked) play(range[0],range[1]); else stop(); return; }
+    // voice
+    const v=activeIn(melody,beat,n=>n.start,n=>n.beats);
+    if(v!==curV){
+      if(curV>=0){ vMark(curV,'playing',false); if(v<0 || melody[v].line===melody[curV].line){ vMark(curV,'sung',true); sung.push(curV); } }
+      if(v>=0){
+        if(sung.length && melody[sung[0]].line!==melody[v].line){ sung.forEach(i=>vMark(i,'sung',false)); sung=[]; }
+        vMark(v,'playing',true);
+        if(lineOfV[v]!==lastLine){ lastLine=lineOfV[v]; follow(vEls[v]); }
+      }
+      curV=v;
+    }
+    // karaoke line: current phrase, or the next one while resting
+    if(v>=0){ showPhrase(melody[v].line); progress(v); }
+    else {
+      const ni=melody.findIndex(n=>n.start>beat), nx=ni>=0?melody[ni]:null;
+      const doneLine = sung.length ? melody[sung[0]].line : -1;
+      if(nx && nx.line===doneLine){ showPhrase(nx.line); progressRest(ni); }
+      else if(nx && nx.start-beat<6){ showPhrase(nx.line); progress(-1); }
+      else if(doneLine>=0){ showPhrase(doneLine); progressRest(Infinity); }
+    }
+    // piano
+    if(pianoBox.checked){
+      const r=activeIn(PIANO.rh,beat,n=>n.t,n=>n.dur), l=activeIn(PIANO.lh,beat,n=>n.t,n=>n.dur);
+      if(r!==curRH){ if(curRH>=0) cls(rhEls[curRH],'pplay',false); if(r>=0) cls(rhEls[r],'pplay',true); curRH=r; if(v<0 && r>=0 && lineOfP[r]!==lastLine){ lastLine=lineOfP[r]; follow(rhEls[r]); } }
+      if(l!==curLH){ if(curLH>=0) cls(lhEls[curLH],'pplay',false); if(l>=0) cls(lhEls[l],'pplay',true); curLH=l; }
+    }
+    const bar=Math.floor(Math.max(0,beat)/4)+1;
+    kLabel.textContent = bar<5 ? 'Introduction' : 'Bar '+Math.min(bar,40);
+    raf=requestAnimationFrame(tick);
+  }
+
+  function onClick(abcelem){
+    const b=clickBeat.get(abcelem && abcelem.startChar);
+    if(b===undefined) return;
+    const [s0,s1]=sectionRange();
+    const to = (b>=s0 && b<s1) ? s1 : PIECE_END+(mixSel.value!=='melody'?2:0);
+    play(b,to);
+  }
+
+  playBtn.addEventListener('click',()=>{ if(playing) stop(); else { const r=sectionRange(); play(r[0],r[1]); } });
+  pitchBtn.addEventListener('click',()=>{
+    stop(); audio();
+    const r=60+semis()-(voiceSel.value==='low'?12:0), t=ctx.currentTime+0.05;
+    pianoTone(r,t,0.5,0.12); pianoTone(r+4,t+0.45,0.5,0.12); pianoTone(r+7,t+0.9,0.5,0.12);
+    voiceTone(r+4,t+1.45,1.8,0.28);
+    kLabel.textContent='First note'; kLine.innerHTML='<span class="s now">A-</span>';
+    setTimeout(()=>{ if(!playing) resetKaraoke(); },3600);
+  });
+  keySel.addEventListener('change',()=>{ store.set('key',keySel.value); render(); });
+  voiceSel.addEventListener('change',()=>{ const k=keySel.value; store.set('voice',voiceSel.value); updateKeyLabels(); keySel.value=k; render(); });
+  pianoBox.addEventListener('change',()=>{ store.set('piano',pianoBox.checked?'1':'0'); render(); });
+  mixSel.addEventListener('change',()=>{ store.set('mix',mixSel.value); if(playing){ const r=sectionRange(); play(Math.floor(nowBeat()/2)*2, Math.max(range[1], r[1])); } });
+  sectionSel.addEventListener('change',()=>{ if(playing){ const r=sectionRange(); play(r[0],r[1]); } });
+  tempo.addEventListener('input',()=>{ tempoVal.textContent=tempo.value; });
+  tempo.addEventListener('change',()=>{ store.set('tempo',tempo.value); if(playing){ play(Math.max(range[0],Math.floor(nowBeat()/2)*2), range[1]); } });
+
+  let rt=0,lastW=0;
+  window.addEventListener('resize',()=>{ clearTimeout(rt); rt=setTimeout(()=>{ const w=$('score').parentElement.clientWidth; if(Math.abs(w-lastW)<20) return; lastW=w; render(); },200); });
+  if(window.matchMedia){ const mq=window.matchMedia('(prefers-color-scheme: dark)'); if(mq.addEventListener) mq.addEventListener('change',()=>{ if(!playing) render(); }); }
+  function start(){ lastW=$('score').parentElement.clientWidth; render(); }
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(start); else start();
+})();
+</script>
+</body>
+</html>

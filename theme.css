@@ -1,0 +1,26 @@
+/* Site-wide palette. Every page loads this, including the sing-along scores.
+   In a score it comes after the score's own <style>, and the selectors match
+   the ones the scores use, so these colours win and the scores match the site. */
+:root{
+  --bg:#F6F4EF; --page:#FBFAF6; --ink:#1E2328; --muted:#626A73;
+  --accent:#2F5A8A; --accent-ink:#FFFFFF; --rule:#DAD6CC; --sung:#8FA6C0;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#14171B; --page:#1A1E23; --ink:#E6E8EB; --muted:#9AA2AC;
+    --accent:#8FB4E0; --accent-ink:#0C1520; --rule:#2B3037; --sung:#4F6A88;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#14171B; --page:#1A1E23; --ink:#E6E8EB; --muted:#9AA2AC;
+  --accent:#8FB4E0; --accent-ink:#0C1520; --rule:#2B3037; --sung:#4F6A88;
+  color-scheme: dark;
+}
+
+/* "← saribekyan.me" link at the top of the scores */
+.home-bar{max-width:900px;margin:0 auto;padding:22px 18px 0}
+.home-bar a{color:var(--muted);font-size:0.95rem;text-decoration:none;font-family:"EB Garamond", Garamond, "Times New Roman", serif}
+.home-bar a:hover{color:var(--accent)}
+.home-bar + header{padding-top:24px !important}
