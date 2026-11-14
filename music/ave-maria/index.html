@@ -41,6 +41,8 @@ h1{font-weight:500;font-size:clamp(2.2rem,6.5vw,3.5rem);line-height:1.02;margin:
 button{font:inherit;font-size:1rem;border-radius:6px;cursor:pointer;padding:6px 14px;border:1px solid var(--rule);background:transparent;color:var(--ink)}
 button.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600;min-width:5.5em}
 button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.hear{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;font-size:0.95rem;color:var(--muted)}
+.hear input[type=range]{width:80px}
 label.ctl{display:flex;align-items:center;gap:6px;font-size:0.95rem;color:var(--muted)}
 select{font:inherit;font-size:0.95rem;color:var(--ink);background:var(--page);border:1px solid var(--rule);border-radius:6px;padding:4px 6px;max-width:100%}
 input[type=range]{accent-color:var(--accent);width:110px}
@@ -86,7 +88,7 @@ footer a{color:var(--accent)}
 }
 @media (prefers-reduced-motion: reduce){ .k-line .s{transition:none} }
 </style>
-<link rel="stylesheet" href="/theme.css">
+<link rel="stylesheet" href="/theme.css?v=4">
 </head>
 <body>
 <div class="home-bar"><a href="/">← hayk.saribekyan.me</a></div>
@@ -110,13 +112,12 @@ footer a{color:var(--accent)}
         <option value="low">Lower (octave down)</option>
       </select>
     </label>
-    <label class="ctl">Hear
-      <select id="mix">
-        <option value="both">Melody and piano</option>
-        <option value="piano">Piano only</option>
-        <option value="melody">Melody only</option>
-      </select>
-    </label>
+    <span class="hear">Hear
+      <label class="ctl"><input id="hearVoice" type="checkbox" checked> Voice</label>
+      <input id="voiceVol" type="range" min="0" max="1.5" step="0.05" value="0.8" aria-label="Voice volume">
+      <label class="ctl"><input id="hearPiano" type="checkbox" checked> Piano</label>
+      <input id="pianoVol" type="range" min="0" max="1.5" step="0.05" value="0.5" aria-label="Piano volume">
+    </span>
     <label class="ctl">Play
       <select id="section">
         <option value="all">Whole piece</option>
@@ -135,7 +136,7 @@ footer a{color:var(--accent)}
 
 <main class="wrap">
   <div class="sheet"><div id="score"></div></div>
-  <p class="hint">Blue is the voice; with the piano part shown, the piano notes light up in gold. The piano plays four bars on its own before you come in.</p>
+  <p class="hint">The voice lights up in pink; with the piano part shown, the piano notes light up in gold. The piano plays four bars on its own before you come in.</p>
 
   <section class="notes">
     <h2>The text</h2>
@@ -151,15 +152,17 @@ footer a{color:var(--accent)}
     <p>The line spans a thirteenth, from the low notes on “Dominus”, “benedictus” and the end of “nostrae” up to the climax on “hora” about two-thirds of the way through. Choose the key by that top note: it should feel exciting, not desperate. G major is Gounod’s own key for soprano; altos and baritones often sing it in C or D. If you have a low voice, set Voice to Lower so the score reads an octave down.</p>
 
     <h2>Practising</h2>
-    <p>Start with Melody and piano until the tune is secure, then switch to Piano only and sing it yourself while the words keep lighting up. Work phrase by phrase with the Play menu and Loop, or tap the note where you want to start. The last section, from “nunc et in hora”, carries the big climax and needs a full breath before it. Every phrase ends with a rest, so breathe there, and let the long notes on “A-” and “Ma-” float rather than push.</p>
+    <p>Start with both Voice and Piano ticked until the tune is secure, then untick Voice and sing it yourself while the words keep lighting up. Untick both to sing completely on your own with just the words to guide you. Work phrase by phrase with the Play menu and Loop, or tap the note where you want to start. The last section, from “nunc et in hora”, carries the big climax and needs a full breath before it. Every phrase ends with a rest, so breathe there, and let the long notes on “A-” and “Ma-” float rather than push.</p>
   </section>
 </main>
 
 <footer class="wrap">
-  For printed scores with the full piano part, the <a href="https://www.cpdl.org/wiki/index.php/Ave_Maria_(Bach-Gounod)" target="_blank" rel="noopener">Choral Public Domain Library</a> has free editions in G.
+  For printed scores with the full piano part, the <a href="https://www.cpdl.org/wiki/index.php/Ave_Maria_(Bach-Gounod)" target="_blank" rel="noopener">Choral Public Domain Library</a> has free editions in G.<br>
+  Sounds: Salamander Grand Piano by Alexander Holm (CC BY 3.0) and the MusyngKite soundfont flute (CC BY-SA 3.0).
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/abcjs@6.4.4/dist/abcjs-basic-min.js"></script>
+<script src="/audio/sampler.js?v=2"></script>
 <script>
 (function(){
 // ---- Ave Maria score data + ABC generator (shared by page and tests) ----
@@ -271,7 +274,7 @@ function buildAbc(lowVoice, withPiano){
     [5,'F major','C','A'],[6,'F♯ major','C♯','A♯'],[7,'G major','D','B'],[8,'A♭ major','E♭','C'],[9,'A major','E','C♯']
   ];
   const $ = id => document.getElementById(id);
-  const playBtn=$('play'), pitchBtn=$('pitch'), keySel=$('key'), voiceSel=$('voice'), mixSel=$('mix'),
+  const playBtn=$('play'), pitchBtn=$('pitch'), keySel=$('key'), voiceSel=$('voice'), hearVoice=$('hearVoice'), hearPiano=$('hearPiano'), voiceVol=$('voiceVol'), pianoVol=$('pianoVol'),
         sectionSel=$('section'), tempo=$('tempo'), tempoVal=$('tempoVal'), loopBox=$('loop'), pianoBox=$('showPiano'),
         kLabel=$('kLabel'), kLine=$('kLine');
   const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -294,7 +297,8 @@ function buildAbc(lowVoice, withPiano){
   const sv=store.get('voice'); if(sv==='low'||sv==='high') voiceSel.value=sv;
   updateKeyLabels();
   const sk=store.get('key'); keySel.value=(sk && KEYS.some(k=>String(k[0])===sk))?sk:'7';
-  const sm=store.get('mix'); if(sm && [...mixSel.options].some(o=>o.value===sm)) mixSel.value=sm;
+  const sm=store.get('mix'); if(sm==='piano') hearVoice.checked=false; if(sm==='melody') hearPiano.checked=false; // older saved setting
+  const shv=store.get('hearVoice'), shp=store.get('hearPiano'); if(shv!==null) hearVoice.checked=shv==='1'; if(shp!==null) hearPiano.checked=shp==='1';
   const st=store.get('tempo'); if(st && +st>=40 && +st<=96) tempo.value=st;
   tempoVal.textContent=tempo.value;
   pianoBox.checked = store.get('piano')==='1';
@@ -322,10 +326,10 @@ function buildAbc(lowVoice, withPiano){
   const PIECE_END=160;
 
   // ---- rendering ----
-  let vEls=[], rhEls=[], lhEls=[], clickBeat=new Map(), lyricOf=[], lineOfV=[], lineOfP=[];
+  let vEls=[], rhEls=[], lhEls=[], clickBeat=new Map(), lyricOf=[], lineOfV=[], lineOfP=[], lineOfL=[];
   const cssVar=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
   function render(){
-    stop();
+    if(!playing) stop();
     const scoreEl=$('score');
     const w=Math.min(scoreEl.parentElement.clientWidth-20, 860);
     const narrow=w<560, piano=pianoBox.checked;
@@ -335,12 +339,12 @@ function buildAbc(lowVoice, withPiano){
       wrap:{minSpacing:piano?1.2:1.4, maxSpacing:2.6, preferredMeasuresPerLine: piano?(narrow?1:2):(narrow?2:4)},
       paddingleft:0, paddingright:0, paddingtop:0, clickListener:onClick
     })[0];
-    vEls=[]; rhEls=[]; lhEls=[]; lineOfV=[]; lineOfP=[]; clickBeat=new Map();
+    vEls=[]; rhEls=[]; lhEls=[]; lineOfV=[]; lineOfP=[]; lineOfL=[]; clickBeat=new Map(); psung=[]; pLine=-1;
     visual.lines.forEach((l,li)=>{ if(!l.staff) return; l.staff.forEach((s,si)=>{ const vo=s.voices[0]; vo.forEach(e=>{
       if(e.el_type!=='note'||e.rest) return;
       if(si===0){ vEls.push(e); lineOfV.push(li); }
       else if(si===1){ rhEls.push(e); lineOfP.push(li); }
-      else if(si===2){ lhEls.push(e); }
+      else if(si===2){ lhEls.push(e); lineOfL.push(li); }
     }); }); });
     vEls.forEach((e,i)=>{ if(melody[i]) clickBeat.set(e.startChar, melody[i].start); });
     rhEls.forEach((e,i)=>{ if(PIANO.rh[i]) clickBeat.set(e.startChar, PIANO.rh[i].t); });
@@ -353,19 +357,22 @@ function buildAbc(lowVoice, withPiano){
       if(cls.length<4) return [];
       return [...svg.querySelectorAll('.abcjs-lyric.'+cls.join('.'))];
     });
+    if(playing){ sung.forEach(i=>vMark(i,'sung',true)); curV=curRH=curLH=-1; lastLine=-1; } // the next frame marks the current notes again
   }
+  // piano notes already played on the current line fade, like the voice's
+  let psung=[], pLine=-1;
+  function pFade(e){ if(e){ cls(e,'psung',true); psung.push(e); } }
+  function pLineIs(line){ if(line!==pLine){ psung.forEach(e=>cls(e,'psung',false)); psung=[]; pLine=line; } }
   function cls(e,name,on){ if(e&&e.abselem&&e.abselem.elemset) e.abselem.elemset.forEach(x=>x&&x.classList&&x.classList.toggle(name,on)); }
   function vMark(i,name,on){ cls(vEls[i],name,on); (lyricOf[i]||[]).forEach(x=>x.classList.toggle(name,on)); }
 
   // ---- audio ----
-  let ctx=null, master=null;
+  let ctx=null, mix=null;
   function audio(){
     if(!ctx){
       try{ if(navigator.audioSession) navigator.audioSession.type='playback'; }catch(e){}
       ctx=new (window.AudioContext||window.webkitAudioContext)();
-      master=ctx.createGain(); master.gain.value=0.9;
-      const lp=ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=3000;
-      master.connect(lp); lp.connect(ctx.destination);
+      mix=Sampler.mixer(ctx); setLevels();
     }
     if(ctx.state==='suspended') ctx.resume();
     return ctx;
@@ -373,21 +380,21 @@ function buildAbc(lowVoice, withPiano){
   const hz=m=>440*Math.pow(2,(m-69)/12);
   let live=[];
   function track(nodes,end){ live.push({nodes,end}); if(live.length>300){ const now=ctx.currentTime; live=live.filter(v=>v.end>now); } }
-  function voiceTone(midi,start,dur,vol){
+  function synthVoice(midi,start,dur,vol){
     const o=ctx.createOscillator(), o2=ctx.createOscillator(), g=ctx.createGain(), g2=ctx.createGain();
     o.type='triangle'; o2.type='sine'; o.frequency.value=hz(midi); o2.frequency.value=hz(midi)*2; g2.gain.value=0.12;
     const nodes=[o,o2];
     if(dur>0.7){ const lfo=ctx.createOscillator(), lg=ctx.createGain(); lfo.frequency.value=5.2; lg.gain.setValueAtTime(0,start); lg.gain.linearRampToValueAtTime(hz(midi)*0.004,start+0.5); lfo.connect(lg); lg.connect(o.frequency); lfo.start(start); lfo.stop(start+dur+0.1); nodes.push(lfo); }
-    o.connect(g); o2.connect(g2); g2.connect(g); g.connect(master);
+    o.connect(g); o2.connect(g2); g2.connect(g); g.connect(mix.synthVoice);
     const v=vol||0.26, end=start+Math.max(0.08,dur);
     g.gain.setValueAtTime(0,start); g.gain.linearRampToValueAtTime(v,start+0.04);
     g.gain.linearRampToValueAtTime(v*0.8,start+0.25); g.gain.setValueAtTime(v*0.8,Math.max(start+0.25,end-0.06)); g.gain.linearRampToValueAtTime(0,end);
     o.start(start); o2.start(start); o.stop(end+0.05); o2.stop(end+0.05);
     track(nodes,end);
   }
-  function pianoTone(midi,start,hold,vol){
+  function synthPiano(midi,start,hold,vol){
     const o=ctx.createOscillator(), g=ctx.createGain();
-    o.type='triangle'; o.frequency.value=hz(midi); o.connect(g); g.connect(master);
+    o.type='triangle'; o.frequency.value=hz(midi); o.connect(g); g.connect(mix.synthPiano);
     const v=vol||0.07, h=Math.max(0.15,hold), end=start+h+0.4;
     g.gain.setValueAtTime(0,start); g.gain.linearRampToValueAtTime(v,start+0.006);
     g.gain.exponentialRampToValueAtTime(v*0.35,start+0.35);
@@ -396,10 +403,36 @@ function buildAbc(lowVoice, withPiano){
     o.start(start); o.stop(end); track([o],end);
   }
   function silence(){ live.forEach(v=>v.nodes.forEach(n=>{ try{n.stop();}catch(e){} })); live=[]; }
+  // real recordings (flute for the voice, grand piano), falling back to the synth if they didn't load
+  let samplesOk=false, samplesDone=false, samplesP=null;
+  function loadSamples(){
+    audio();
+    if(!samplesP) samplesP=Promise.all([Sampler.ready(ctx,'flute'), Sampler.ready(ctx,'piano')])
+      .then(()=>{ samplesOk=true; }, ()=>{ samplesOk=false; }).then(()=>{ samplesDone=true; });
+    return samplesP;
+  }
+  function whenLoaded(fn){ // run fn now if the sounds are ready, else after they load
+    if(samplesDone) return true;
+    kLabel.textContent=''; kLine.innerHTML='<span class="k-hint">Loading sounds…</span>';
+    loadSamples().then(fn); return false;
+  }
+  function voiceTone(midi,start,dur,vol){
+    const n=samplesOk && Sampler.play(ctx,mix.voice,'flute',midi,start,dur,0.5*(vol||0.26)/0.26);
+    if(n) track([n],start+dur+0.1); else synthVoice(midi,start,dur,vol);
+  }
+  function pianoTone(midi,start,hold,vol){
+    const n=samplesOk && Sampler.play(ctx,mix.piano,'piano',midi,start,hold,0.45*(vol||0.07)/0.07);
+    if(n) track([n],start+hold+0.6); else synthPiano(midi,start,hold,vol);
+  }
+  function setLevels(){ // live: checkboxes mute, sliders set the volume
+    if(!mix) return;
+    Sampler.setLevel(ctx,mix.voice,hearVoice.checked ? +voiceVol.value : 0);
+    Sampler.setLevel(ctx,mix.piano,hearPiano.checked ? +pianoVol.value : 0);
+  }
   const melodyShift=()=>semis()-(voiceSel.value==='low'?12:0);
 
   function sectionRange(){
-    const [b0,b1]=SECTIONS[sectionSel.value], piano=mixSel.value!=='melody';
+    const [b0,b1]=SECTIONS[sectionSel.value], piano=hearPiano.checked;
     let from=(b0-1)*4, to=b1*4;
     if(sectionSel.value==='all' && !piano) from=16;
     if(sectionSel.value!=='all' && piano) from-=4; // a bar of piano to lead in
@@ -407,7 +440,7 @@ function buildAbc(lowVoice, withPiano){
     return [Math.max(0,from), to];
   }
   function buildEvents(from,to){
-    const ev=[], t=semis(), wantPiano=mixSel.value!=='melody', wantMelody=mixSel.value!=='piano';
+    const ev=[], t=semis(), wantPiano=true, wantMelody=true;
     if(wantPiano){
       PIANO.lh.forEach(n=>{
         if(n.t>=from && n.t<to){ n.m.forEach((m,k)=>ev.push({t:n.t+(n.m.length>2?k*0.04:k*0.25), kind:'p', m:m+t, hold:n.dur-(n.m.length>2?0:k*0.25), v:k===0?0.085:0.07})); }
@@ -417,8 +450,14 @@ function buildAbc(lowVoice, withPiano){
     }
     if(wantMelody){
       melody.forEach((n,i)=>{
-        if(n.start<from-1e-6 || n.start>=to) return;
-        if(n.tieEnd && i>0 && melody[i-1].start>=from-1e-6) return;
+        if(n.start>=to) return;
+        if(n.start<from-1e-6){ // already sounding when we (re)start: play the rest of it
+          if(n.start+n.beats<=from+1e-6 || (n.tieEnd && i>0 && melody[i-1].start+melody[i-1].beats>from+1e-6)) return;
+          let beats=n.start+n.beats-from, j=i; while(melody[j].tieStart && melody[j+1]){ j++; beats+=melody[j].beats; }
+          if(beats>0.05) ev.push({t:from, kind:'m', m:n.midi+melodyShift(), beats});
+          return;
+        }
+        if(n.tieEnd && i>0 && melody[i-1].start+melody[i-1].beats>from+1e-6) return;
         let beats=n.beats, j=i; while(melody[j].tieStart && melody[j+1]){ j++; beats+=melody[j].beats; }
         ev.push({t:n.start, kind:'m', m:n.midi+melodyShift(), beats});
       });
@@ -453,12 +492,14 @@ function buildAbc(lowVoice, withPiano){
   function clearMarks(){
     if(curV>=0) vMark(curV,'playing',false); sung.forEach(i=>vMark(i,'sung',false)); sung=[];
     if(curRH>=0) cls(rhEls[curRH],'pplay',false); if(curLH>=0) cls(lhEls[curLH],'pplay',false);
+    psung.forEach(e=>cls(e,'psung',false)); psung=[]; pLine=-1;
     curV=curRH=curLH=-1; lastLine=-1;
   }
-  function play(from,to){
+  function play(from,to,loopFrom){
+    if(!whenLoaded(()=>play(from,to,loopFrom))) return;
     audio(); silence(); clearInterval(timer); cancelAnimationFrame(raf); clearMarks();
-    range=[from,to]; ev=buildEvents(from,to); idx=0;
-    spb=60/parseInt(tempo.value,10); t0=ctx.currentTime+0.15-from*spb;
+    range=[loopFrom==null?from:loopFrom, to]; ev=buildEvents(from,to); idx=0;
+    spb=60/parseInt(tempo.value,10); t0=ctx.currentTime+(loopFrom==null?0.15:0.05)-from*spb;
     playing=true; playBtn.textContent='Stop';
     schedule(); timer=setInterval(schedule,40); tick();
   }
@@ -518,8 +559,8 @@ function buildAbc(lowVoice, withPiano){
     // piano
     if(pianoBox.checked){
       const r=activeIn(PIANO.rh,beat,n=>n.t,n=>n.dur), l=activeIn(PIANO.lh,beat,n=>n.t,n=>n.dur);
-      if(r!==curRH){ if(curRH>=0) cls(rhEls[curRH],'pplay',false); if(r>=0) cls(rhEls[r],'pplay',true); curRH=r; if(v<0 && r>=0 && lineOfP[r]!==lastLine){ lastLine=lineOfP[r]; follow(rhEls[r]); } }
-      if(l!==curLH){ if(curLH>=0) cls(lhEls[curLH],'pplay',false); if(l>=0) cls(lhEls[l],'pplay',true); curLH=l; }
+      if(r!==curRH){ if(curRH>=0){ cls(rhEls[curRH],'pplay',false); pFade(rhEls[curRH]); } if(r>=0){ pLineIs(lineOfP[r]); cls(rhEls[r],'pplay',true); } curRH=r; if(v<0 && r>=0 && lineOfP[r]!==lastLine){ lastLine=lineOfP[r]; follow(rhEls[r]); } }
+      if(l!==curLH){ if(curLH>=0){ cls(lhEls[curLH],'pplay',false); pFade(lhEls[curLH]); } if(l>=0){ pLineIs(lineOfL[l]); cls(lhEls[l],'pplay',true); } curLH=l; }
     }
     const bar=Math.floor(Math.max(0,beat)/4)+1;
     kLabel.textContent = bar<5 ? 'Introduction' : 'Bar '+Math.min(bar,40);
@@ -530,31 +571,36 @@ function buildAbc(lowVoice, withPiano){
     const b=clickBeat.get(abcelem && abcelem.startChar);
     if(b===undefined) return;
     const [s0,s1]=sectionRange();
-    const to = (b>=s0 && b<s1) ? s1 : PIECE_END+(mixSel.value!=='melody'?2:0);
+    const to = (b>=s0 && b<s1) ? s1 : PIECE_END+(hearPiano.checked?2:0);
     play(b,to);
   }
 
   playBtn.addEventListener('click',()=>{ if(playing) stop(); else { const r=sectionRange(); play(r[0],r[1]); } });
-  pitchBtn.addEventListener('click',()=>{
-    stop(); audio();
+  pitchBtn.addEventListener('click',function pitch(){
+    stop(); if(!whenLoaded(pitch)) return; audio();
     const r=60+semis()-(voiceSel.value==='low'?12:0), t=ctx.currentTime+0.05;
     pianoTone(r,t,0.5,0.12); pianoTone(r+4,t+0.45,0.5,0.12); pianoTone(r+7,t+0.9,0.5,0.12);
     voiceTone(r+4,t+1.45,1.8,0.28);
     kLabel.textContent='First note'; kLine.innerHTML='<span class="s now">A-</span>';
     setTimeout(()=>{ if(!playing) resetKaraoke(); },3600);
   });
-  keySel.addEventListener('change',()=>{ store.set('key',keySel.value); render(); });
-  voiceSel.addEventListener('change',()=>{ const k=keySel.value; store.set('voice',voiceSel.value); updateKeyLabels(); keySel.value=k; render(); });
+  const carryOn=()=>{ if(playing) play(Math.max(range[0],nowBeat()), range[1], range[0]); }; // continue from exactly here
+  keySel.addEventListener('change',()=>{ store.set('key',keySel.value); render(); carryOn(); });
+  voiceSel.addEventListener('change',()=>{ const k=keySel.value; store.set('voice',voiceSel.value); updateKeyLabels(); keySel.value=k; render(); carryOn(); });
   pianoBox.addEventListener('change',()=>{ store.set('piano',pianoBox.checked?'1':'0'); render(); });
-  mixSel.addEventListener('change',()=>{ store.set('mix',mixSel.value); if(playing){ const r=sectionRange(); play(Math.floor(nowBeat()/2)*2, Math.max(range[1], r[1])); } });
+  const svv=store.get('voiceVol'), spv=store.get('pianoVol');
+  if(svv!==null) voiceVol.value=svv; if(spv!==null) pianoVol.value=spv;
+  const onHear=()=>{ setLevels(); store.set('hearVoice',hearVoice.checked?'1':'0'); store.set('hearPiano',hearPiano.checked?'1':'0'); store.set('voiceVol',voiceVol.value); store.set('pianoVol',pianoVol.value); };
+  [hearVoice,hearPiano].forEach(el=>el.addEventListener('change',onHear));
+  [voiceVol,pianoVol].forEach(el=>{ el.addEventListener('input',setLevels); el.addEventListener('change',onHear); });
   sectionSel.addEventListener('change',()=>{ if(playing){ const r=sectionRange(); play(r[0],r[1]); } });
   tempo.addEventListener('input',()=>{ tempoVal.textContent=tempo.value; });
-  tempo.addEventListener('change',()=>{ store.set('tempo',tempo.value); if(playing){ play(Math.max(range[0],Math.floor(nowBeat()/2)*2), range[1]); } });
+  tempo.addEventListener('change',()=>{ store.set('tempo',tempo.value); carryOn(); });
 
   let rt=0,lastW=0;
   window.addEventListener('resize',()=>{ clearTimeout(rt); rt=setTimeout(()=>{ const w=$('score').parentElement.clientWidth; if(Math.abs(w-lastW)<20) return; lastW=w; render(); },200); });
   if(window.matchMedia){ const mq=window.matchMedia('(prefers-color-scheme: dark)'); if(mq.addEventListener) mq.addEventListener('change',()=>{ if(!playing) render(); }); }
-  function start(){ lastW=$('score').parentElement.clientWidth; render(); }
+  function start(){ lastW=$('score').parentElement.clientWidth; render(); setTimeout(loadSamples,300); }
   if(document.fonts && document.fonts.ready) document.fonts.ready.then(start); else start();
 })();
 </script>

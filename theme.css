@@ -3,19 +3,19 @@
    the ones the scores use, so these colours win and the scores match the site. */
 :root{
   --bg:#F6F4EF; --page:#FBFAF6; --ink:#1E2328; --muted:#626A73;
-  --accent:#2F5A8A; --accent-ink:#FFFFFF; --rule:#DAD6CC; --sung:#8FA6C0;
+  --accent:#2F5A8A; --accent-ink:#FFFFFF; --rule:#DAD6CC; --sung:#E3A6BC; --hl:#C0265E; --piano:#9A6A1F; --piano-sung:#DCC79F;
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
     --bg:#14171B; --page:#1A1E23; --ink:#E6E8EB; --muted:#9AA2AC;
-    --accent:#8FB4E0; --accent-ink:#0C1520; --rule:#2B3037; --sung:#4F6A88;
+    --accent:#8FB4E0; --accent-ink:#0C1520; --rule:#2B3037; --sung:#7A3F58; --hl:#F27AA5; --piano:#D6A657; --piano-sung:#6B5631;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"]{
   --bg:#14171B; --page:#1A1E23; --ink:#E6E8EB; --muted:#9AA2AC;
-  --accent:#8FB4E0; --accent-ink:#0C1520; --rule:#2B3037; --sung:#4F6A88;
+  --accent:#8FB4E0; --accent-ink:#0C1520; --rule:#2B3037; --sung:#7A3F58; --hl:#F27AA5; --piano:#D6A657; --piano-sung:#6B5631;
   color-scheme: dark;
 }
 
@@ -24,3 +24,10 @@
 .home-bar a{color:var(--muted);font-size:0.95rem;text-decoration:none;font-family:"EB Garamond", Garamond, "Times New Roman", serif}
 .home-bar a:hover{color:var(--accent)}
 .home-bar + header{padding-top:24px !important}
+
+/* karaoke highlight: the note and word being sung in raspberry (stands out from the black notes);
+   notes and words already sung fade to a pale pink (--sung) */
+#score .playing, #score .playing *{fill:var(--hl) !important}
+.k-line .done{color:var(--sung)}   /* words already sung fade, like the notes */
+.k-line .now{color:var(--hl)}
+#score .psung, #score .psung *{fill:var(--piano-sung) !important}   /* piano notes already played: pale gold */
