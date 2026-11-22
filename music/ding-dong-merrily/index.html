@@ -82,12 +82,19 @@ main{padding:22px 0 40px}
 section.notes{max-width:64ch;margin-top:34px}
 section.notes h2{font-weight:500;font-size:1.5rem;margin:28px 0 6px}
 section.notes p{margin:0 0 12px}
+.text{display:grid;grid-template-columns:1fr 1fr;gap:12px 24px;margin:6px 0 12px}
+.text p{margin:0}
+.text .en{color:var(--muted);font-style:italic}
+.text .refrain{font-style:italic}
+.say{color:var(--muted)}
 footer{color:var(--muted);font-size:0.85rem;padding:10px 0 40px;max-width:66ch}
 footer a{color:var(--accent)}
 @media (max-width:600px){
   body{font-size:18px}
   header{padding-top:28px}
   input[type=range]{width:90px}
+  .text{grid-template-columns:1fr;gap:4px}
+  .text .en{margin-bottom:10px}
   .k-line{font-size:1.25rem}
   .k-label{min-width:0}
 }
@@ -147,6 +154,28 @@ footer a{color:var(--accent)}
     <p>It is a falling sequence: the same six-note shape, “long-short, four quick”, starting one step lower each bar. Learn the first bar on a neutral “loo”, then simply step it down. Choirs share the breathing, but on your own you need a deep breath before “Glo-” and, if needed, a quick sip at the start of the fifth bar, where the run is halfway down.</p>
     <h2>Singing it unaccompanied</h2>
     <p>Untick Piano, or both Voice and Piano, to practise it the way it is usually sung. Use the Starting note button before each attempt, and check yourself at the end of the Gloria: your last note should land back on the same note you started on. If it doesn’t, the usual culprit is the Gloria sagging flat as it descends, so keep each new bar’s first note bright.</p>
+  </section>
+
+  <section class="notes words">
+    <h2>The words</h2>
+    <div class="text">
+      <p>1. Ding dong! merrily on high,<br>in heav’n the bells are ringing:<br>Ding dong! verily the sky<br>is riv’n with angel singing.</p>
+      <p class="en">Ding dong! Up in heaven, happily,<br>the bells are ringing.<br>Ding dong! Truly, the sky<br>is split open by the angels’ singing.</p>
+      <p class="refrain">Gloria, Hosanna in excelsis!</p>
+      <p class="en">Glory! Praise God in the highest!</p>
+      <p>2. E’en so here below, below,<br>let steeple bells be swungen,<br>and i-o, i-o, i-o,<br>by priest and people sungen.</p>
+      <p class="en">In the same way, down here on earth,<br>let the church bells swing and ring,<br>and let a joyful “i-o” (“hooray!”)<br>be sung by priests and people.</p>
+      <p class="refrain">Gloria, Hosanna in excelsis!</p>
+      <p class="en">Glory! Praise God in the highest!</p>
+      <p>3. Pray you, dutifully prime<br>your matin chime, ye ringers;<br>may you beautifully rime<br>your evetime song, ye singers.</p>
+      <p class="en">Please, do your duty and get ready<br>to ring the morning bells, ringers;<br>and may you sing beautifully<br>your evening song, you singers.</p>
+      <p class="refrain">Gloria, Hosanna in excelsis!</p>
+      <p class="en">Glory! Praise God in the highest!</p>
+    </div>
+    <p>The words are old-fashioned on purpose: George Woodward wrote them in 1924 in the style of a medieval carol. “Swungen” and “sungen” are made-up old forms of “swung” and “sung”, chosen for the rhyme; “matin” means morning prayers, “evetime” evening, and “rime” is an old spelling of “rhyme”, used here to mean “sing”.</p>
+
+    <h2>Pronunciation</h2>
+    <p>The Gloria is usually sung in church Latin: <span class="say">Gloria</span> is GLOH-ree-ah, <span class="say">Hosanna</span> is hoh-ZAH-nah, and <span class="say">in excelsis</span> is in ek-SHEL-sees. In the verses, a few words are squeezed into one syllable to fit the tune: <span class="say">heav’n</span> is “hevn”, <span class="say">riv’n</span> rhymes with “given”, and <span class="say">e’en</span> is “een”. <span class="say">I-o</span> is EE-oh, <span class="say">swungen</span> and <span class="say">sungen</span> are SWUNG-en and SUNG-en, and <span class="say">matin</span> is MAT-in.</p>
   </section>
 </main>
 
