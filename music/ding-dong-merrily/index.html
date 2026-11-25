@@ -89,6 +89,21 @@ section.notes p{margin:0 0 12px}
 .say{color:var(--muted)}
 footer{color:var(--muted);font-size:0.85rem;padding:10px 0 40px;max-width:66ch}
 footer a{color:var(--accent)}
+.print-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;margin:14px 2px 0;color:var(--muted);font-size:0.95rem}
+#print{position:absolute;left:-10000px;top:0;width:680px}   /* off-screen but laid out, so the score can be measured */
+@media print{
+  @page{size:A4;margin:14mm 10mm 12mm}
+  html,body{background:#fff !important;color:#1E2328 !important;margin:0 !important;padding:0 !important;width:auto !important}
+  :root{padding:0 !important}
+  body>*:not(#print){display:none !important}
+  #print{position:static;width:190mm;margin:0 auto;padding-top:10mm;display:block;font-family:"EB Garamond",Georgia,serif;color:#1E2328}
+  #print h1{font-weight:500;font-size:26pt;margin:0;text-align:center}
+  #print .p-sub{text-align:center;font-style:italic;color:#555;margin:2px 0 4px;font-size:11pt}
+  #print .p-credit{text-align:center;color:#666;font-size:9pt;margin:0 0 10px}
+  #print svg{display:block;width:100% !important;height:auto !important}
+  #pScore>div{break-inside:avoid;height:auto !important}
+  #pScore{height:auto !important;overflow:visible !important}   /* abcjs fixes the height before the gaps are added */
+}
 @media (max-width:600px){
   body{font-size:18px}
   header{padding-top:28px}
@@ -146,6 +161,10 @@ footer a{color:var(--accent)}
 <main class="wrap">
   <div class="sheet"><div id="score"></div></div>
   <p class="hint">The voice lights up in pink; with the piano part shown, the piano notes light up in gold. Tap any note, in the voice or the piano, to start from there. The verse tune is sung twice per verse (first and second lines, then third and fourth), and the Gloria is repeated.</p>
+  <div class="print-row"><span>Print in the key and voice chosen above:</span>
+    <button id="printVoice" type="button">Voice only</button>
+    <button id="printPiano" type="button">Voice and piano</button>
+  </div>
 
   <section class="notes">
     <h2>How it fits together</h2>
@@ -183,6 +202,13 @@ footer a{color:var(--accent)}
   For printed parts, the Choral Public Domain Library has free SATB editions where the soprano line is this melody.<br>
   Sounds: Salamander Grand Piano by Alexander Holm (CC BY 3.0) and the MusyngKite soundfont flute (CC BY-SA 3.0).
 </footer>
+
+<div id="print" aria-hidden="true">
+  <h1>Ding Dong! Merrily on High</h1>
+  <div class="p-sub" id="pSub"></div>
+  <p class="p-credit">Tune: Branle de l’Official, from Thoinot Arbeau’s Orchésographie (1589). Words: George Ratcliffe Woodward (1924). Piano: the alto, tenor and bass of Charles Wood’s harmonization (1924), from Klaus Föhl’s CPDL edition.</p>
+  <div id="pScore"></div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/abcjs@6.4.4/dist/abcjs-basic-min.js"></script>
 <script src="/audio/sampler.js?v=2"></script>
@@ -544,6 +570,47 @@ w: _ _ _ _ _ _ ri-_ a, Ho-san-na in ex-cel-sis!
   [hearVoice,hearPiano].forEach(el=>el.addEventListener('change',onHear));
   [voiceVol,pianoVol].forEach(el=>{ el.addEventListener('input',setLevels); el.addEventListener('change',onHear); });
   tempo.addEventListener('input',()=>{ tempoVal.textContent=tempo.value; });
+
+  // ---- printing: the score in the chosen key and voice, laid out for an A4 page ----
+  // voice only: two bars a line in the verses so the words breathe, with room for notes above each line
+  const PRINT_VOICE = (clef) => `X:1
+M:4/4
+L:1/4
+%%vocalfont EB Garamond 15
+K:G ${clef}
+G G A/G/F/E/ | D3 D |
+w: 1.~Ding dong! mer-ri-ly on high, in
+w: 2.~E’en so here be-low, be-low, let
+w: 3.~Pray you, du-ti-ful-ly prime your
+E G G F | G2 G2 |
+w: heav’n the bells are ring-ing:
+w: stee-ple bells be swung-en,
+w: ma-tin chime, ye ring-ers;
+G G A/G/F/E/ | D3 D |
+w: Ding dong! ve-ri-ly the sky is
+w: and i-o, i-o, i-o, by
+w: may you beau-ti-ful-ly rime your
+E G G F | G2 G2 |]
+w: riv’n with an-gel sing-ing.
+w: priest and peo-ple sung-en.
+w: eve-time song, ye sing-ers.
+|: d>c B/c/d/B/ | c>B A/B/c/A/ | B>A G/A/B/G/ | A>G F/G/A/F/ |
+w: Glo-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+G>F E/F/G/E/ | F>E D D | E G G F | G2 G2 :|
+w: _ _ _ _ _ _ ri-_ a, Ho-san-na in ex-cel-sis!
+`;
+  function printScore(withPiano){
+    const clef = voiceSel.value==='low' ? 'clef=treble-8' : '';
+    const k=parseInt(keySel.value,10), key=(KEYS.find(x=>x[0]===k)||KEYS[6])[1].replace('♭','-flat').replace('♯','-sharp');
+    $('pSub').textContent=(voiceSel.value==='low'?'Lower voice':'Higher voice')+(withPiano?' and piano':'')+', in '+key+(withPiano?' · piano: Charles Wood’s harmony':'');
+    const abc = withPiano ? tuneFor(clef,true).replace('EB Garamond 15','EB Garamond 13') : PRINT_VOICE(clef);
+    ABCJS.renderAbc('pScore', abc, Object.assign({paddingleft:0, paddingright:0, paddingtop:0, paddingbottom:0, visualTranspose:k, oneSvgPerLine:true, foregroundColor:'#1E2328'},
+      {staffwidth: withPiano ? 1010 : 670}));   // drawn at this width, then fitted to the 190mm A4 column
+    $('pScore').querySelectorAll('svg').forEach(svg=>{ const box=svg.parentElement.style; if(withPiano) box.marginBottom='3mm'; else box.marginTop='14mm'; });   // each line sits in its own box; voice only leaves room to write above every staff
+    window.print();
+  }
+  $('printVoice').addEventListener('click',()=>printScore(false));
+  $('printPiano').addEventListener('click',()=>printScore(true));
   tempo.addEventListener('change',()=>{ store.set('tempo',tempo.value); carryOn(); });
 
   let rt=0, lastW=0;

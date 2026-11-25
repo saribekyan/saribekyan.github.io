@@ -87,6 +87,21 @@ footer a{color:var(--accent)}
   .k-label{min-width:0}
 }
 @media (prefers-reduced-motion: reduce){ .k-line .s{transition:none} }
+.print-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;margin:14px 2px 0;color:var(--muted);font-size:0.95rem}
+#print{position:absolute;left:-10000px;top:0;width:680px}   /* off-screen but laid out, so the score can be measured */
+@media print{
+  @page{size:A4;margin:14mm 10mm 12mm}
+  html,body{background:#fff !important;color:#1E2328 !important;margin:0 !important;padding:0 !important;width:auto !important}
+  :root{padding:0 !important}
+  body>*:not(#print){display:none !important}
+  #print{position:static;width:190mm;margin:0 auto;padding-top:10mm;display:block;font-family:"EB Garamond",Georgia,serif;color:#1E2328}
+  #print h1{font-weight:500;font-size:26pt;margin:0;text-align:center}
+  #print .p-sub{text-align:center;font-style:italic;color:#555;margin:2px 0 4px;font-size:11pt}
+  #print .p-credit{text-align:center;color:#666;font-size:9pt;margin:0 0 10px}
+  #print svg{display:block;width:100% !important;height:auto !important}
+  #pScore>div{break-inside:avoid;height:auto !important}
+  #pScore{height:auto !important;overflow:visible !important}   /* abcjs fixes the height before the gaps are added */
+}
 </style>
 <link rel="stylesheet" href="/theme.css?v=4">
 </head>
@@ -137,6 +152,10 @@ footer a{color:var(--accent)}
 <main class="wrap">
   <div class="sheet"><div id="score"></div></div>
   <p class="hint">The voice lights up in pink; with the piano part shown, the piano notes light up in gold. The piano plays four bars on its own before you come in.</p>
+  <div class="print-row"><span>Print in the key and voice chosen above:</span>
+    <button id="printVoice" type="button">Voice only</button>
+    <button id="printPiano" type="button">Voice and piano</button>
+  </div>
 
   <section class="notes">
     <h2>Pronunciation</h2>
@@ -164,6 +183,13 @@ footer a{color:var(--accent)}
   For printed scores with the full piano part, the <a href="https://www.cpdl.org/wiki/index.php/Ave_Maria_(Bach-Gounod)" target="_blank" rel="noopener">Choral Public Domain Library</a> has free editions in G.<br>
   Sounds: Salamander Grand Piano by Alexander Holm (CC BY 3.0) and the MusyngKite soundfont flute (CC BY-SA 3.0).
 </footer>
+
+<div id="print" aria-hidden="true">
+  <h1>Ave Maria</h1>
+  <div class="p-sub" id="pSub"></div>
+  <p class="p-credit">Melody: Charles Gounod (vocal version 1859), set over J. S. Bach’s Prelude in C major, BWV 846, with the extra bar Gounod used. Text: the Latin Hail Mary.</p>
+  <div id="pScore"></div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/abcjs@6.4.4/dist/abcjs-basic-min.js"></script>
 <script src="/audio/sampler.js?v=2"></script>
@@ -599,6 +625,20 @@ function buildAbc(lowVoice, withPiano){
   [voiceVol,pianoVol].forEach(el=>{ el.addEventListener('input',setLevels); el.addEventListener('change',onHear); });
   sectionSel.addEventListener('change',()=>{ if(playing){ const r=sectionRange(); play(r[0],r[1]); } });
   tempo.addEventListener('input',()=>{ tempoVal.textContent=tempo.value; });
+
+  // ---- printing: the score in the chosen key and voice, laid out for an A4 page ----
+  function printScore(withPiano){
+    const low = voiceSel.value==='low', k=semis();
+    const key=(KEYS.find(x=>x[0]===k)||KEYS[10])[1].replace('♭','-flat').replace('♯','-sharp');
+    $('pSub').textContent=(low?'Lower voice':'Higher voice')+(withPiano?' and piano':'')+', in '+key+(withPiano?' · piano: Bach’s Prelude in C':'');
+    ABCJS.renderAbc('pScore', buildAbc(low, withPiano), {paddingleft:0, paddingright:0, paddingtop:0, paddingbottom:0, visualTranspose:k, oneSvgPerLine:true, foregroundColor:'#1E2328',
+      staffwidth: withPiano ? 900 : 670,   // drawn at this width, then fitted to the 190mm A4 column
+      wrap: withPiano ? {minSpacing:1.2, maxSpacing:2.6, preferredMeasuresPerLine:3} : {minSpacing:1.4, maxSpacing:2.6, preferredMeasuresPerLine:4}});
+    $('pScore').querySelectorAll('svg').forEach(svg=>{ const box=svg.parentElement.style; if(withPiano) box.marginBottom='3mm'; else box.marginTop='14mm'; });   // each line sits in its own box; voice only leaves room to write above every staff
+    window.print();
+  }
+  $('printVoice').addEventListener('click',()=>printScore(false));
+  $('printPiano').addEventListener('click',()=>printScore(true));
   tempo.addEventListener('change',()=>{ store.set('tempo',tempo.value); carryOn(); });
 
   let rt=0,lastW=0;
